@@ -6,7 +6,7 @@ class PersonDb(object):
         self.dbName = dbName
         self.db = None
         if autoload:
-        self.setup()
+            self.setup()
 
     def setup(self):
         self.db = PersonDb.load(self.dbName)
