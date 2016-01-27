@@ -1,4 +1,5 @@
 import pickle
+import os
 
 
 class PersonDb(object):
@@ -26,9 +27,12 @@ class PersonDb(object):
 
     def load(fileName = 'database'):
         filen = PersonDb.fileExtension(fileName)
-        with open(filen, "rb") as pickleIn:
-            data = pickle.load(pickleIn)
-        return data
+        if os.path.exists(filen):
+            with open(filen, "rb") as pickleIn:
+                data = pickle.load(pickleIn)
+            return data
+        else:
+            return []
 
     def fileExtension(fileName):
         result = fileName.strip()
