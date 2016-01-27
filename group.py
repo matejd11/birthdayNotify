@@ -1,5 +1,5 @@
 class group(object):
-    def __init__(self, name, nameday_atr, birthday_atr):
+    def __init__(self, name, namedayAtr, birthdayAtr):
         self.name = name
-        self.nameday_atr = nameday_atr
-        self.birthday_atr = birthday_atr
+        self.namedayAtr = namedayAtr
+        self.birthdayAtr = birthdayAtr

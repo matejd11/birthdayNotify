@@ -1,10 +1,10 @@
 class Person(object):
-    def __init__(self, first_name, second_name, birthday_date, nameday_date, mail, tel_number, facebook, group = []):
-        self.first_name = first_name
-        self.second_name = second_name
-        self.birthday_date = birthday_date
-        self.nameday_date = nameday_date
+    def __init__(self, firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook, group = []):
+        self.firstName = firstName
+        self.secondName = secondName
+        self.birthdayDate = birthdayDate
+        self.namedayDate = namedayDate
         self.mail = mail
-        self.tel_number = tel_number
+        self.telNumber = telNumber
         self.facebook = facebook
         self.group = group
