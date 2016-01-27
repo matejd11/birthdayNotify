@@ -20,12 +20,12 @@ class PersonDb(object):
         self.groups = tmp
 
     def save(data, fileName = 'database'):
-        filen = fileExtension(fileName)
+        filen = PersonDb.fileExtension(fileName)
         with open(filen,"wb") as pickleOut:
             pickle.dump(data, pickleOut)
 
     def load(fileName = 'database'):
-        filen = fileExtension(fileName)
+        filen = PersonDb.fileExtension(fileName)
         with open(filen, "rb") as pickleIn:
             data = pickle.load(pickleIn)
         return data
