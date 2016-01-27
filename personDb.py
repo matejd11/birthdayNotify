@@ -20,6 +20,9 @@ class PersonDb(object):
                 tmp.append(person)
         self.groups = tmp
 
+    def add(self, person):
+        self.db.append(person)
+
     def save(data, fileName = 'database'):
         filen = PersonDb.fileExtension(fileName)
         with open(filen,"wb") as pickleOut:

@@ -10,3 +10,8 @@ class Person(object):
         self.telNumber = telNumber
         self.facebook = facebook
         self.group = group
+
+    def __str__(self):
+        out = "person: "
+        out += self.firstName
+        return out
