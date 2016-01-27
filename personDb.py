@@ -15,8 +15,8 @@ class PersonDb(object):
     def getGroups(self):
         tmp = set()
         for person in self.db:
-        for group in person:
-        tmp.append(person)
+            for group in person:
+                tmp.append(person)
         self.groups = tmp
 
     def save(data, fileName = 'database'):
