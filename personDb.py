@@ -27,11 +27,11 @@ class PersonDb(object):
 
     def load(fileName = 'database'):
         filen = PersonDb.fileExtension(fileName)
-        if os.path.exists(filen):
+        try:
             with open(filen, "rb") as pickleIn:
                 data = pickle.load(pickleIn)
             return data
-        else:
+        except FileNotFoundError:
             return []
 
     def fileExtension(fileName):
