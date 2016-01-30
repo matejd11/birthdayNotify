@@ -4,7 +4,7 @@ from person import Person
 def go(db):
     global status
     while status == 1:
-        inputText = input("command>")
+        inputText = input("command> ")
         for i in commands:
             if inputText == i:
                 commands[i](db)
@@ -12,19 +12,19 @@ def go(db):
 def helpMe(db):
     print("help:")
     for i in commandsHelp:
-        print(i, ":",  commandsHelp[i])
+        print("\t", i, ":",  commandsHelp[i])
 
 def add(db):
     print("add")
 
-    firstName = input("firstName:")
-    secondName = input("secondName:")
-    birthdayDate = input("birthdayDate:")
-    namedayDate = input("namedayDate:")
-    mail = input("mail:")
-    telNumber = input("telNumber:")
-    facebook = input("facebook:")
-    group = input("group:")
+    firstName = input("\tfirstName: ")
+    secondName = input("\tsecondName: ")
+    birthdayDate = input("\tbirthdayDate: ")
+    namedayDate = input("\tnamedayDate: ")
+    mail = input("\tmail: ")
+    telNumber = input("\ttelNumber: ")
+    facebook = input("\tfacebook: ")
+    group = input("\tgroup: ")
 
     newPerson = Person(firstName, secondName, birthdayDate,namedayDate, mail, telNumber, facebook, group)
 
