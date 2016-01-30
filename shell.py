@@ -56,16 +56,53 @@ def quit(db):
     status = 0
 
 def showTable(db):
-    print("\tfirstName\t|secondName\t|birthdayDate\t|namedayDate\t|mail\t\t|telNumber\t|facebook\t|group")
-    print("\t"+"-"*8*16)
+    largestStr = {"firstName": 0, 
+                  "secondName": 0,
+                  "birthdayDate": 0,
+                  "namedayDate": 0,
+                  "mail": 0,
+                  "telNumber": 0,
+                  "facebook": 0,
+                  "group": 0}
     for person in db.db:
-        raw = "\t"+str(person.firstName)+"\t"*((16-len(person.firstName))//8+1)+"|"
-        raw += str(person.secondName)+"\t"*((16-len(person.secondName))//8+1)+"|"
-        raw += str(person.birthdayDate)+"\t"*((16-len(person.birthdayDate))//8+1)+"|"
-        raw += str(person.namedayDate)+"\t"*((16-len(person.namedayDate))//8+1)+"|"
-        raw += str(person.mail)+"\t"*((16-len(person.mail))//8+1)+"|"
-        raw += str(person.telNumber)+"\t"*((16-len(person.telNumber))//8+1)+"|"
-        raw += str(person.facebook)+"\t"*((16+len(person.facebook))//8)+"|"
+        tmp = person.__dict__
+        for index in tmp:
+            if largestStr[index] < len(tmp[index]):
+                largestStr[index] = len(tmp[index])
+    
+    tabSize = []
+    tabSize.append((largestStr["firstName"]-16)//8+1)
+    tabSize.append((largestStr["secondName"]-16)//8+1)
+    tabSize.append((largestStr["birthdayDate"]-16)//8+1)
+    tabSize.append((largestStr["namedayDate"]-16)//8+1)
+    tabSize.append((largestStr["mail"]-8)//8+1)
+    tabSize.append((largestStr["telNumber"]-16)//8+1)
+    tabSize.append((largestStr["facebook"]-16)//8+1)
+
+    for x in range(len(tabSize)):
+        if tabSize[x] < 0:
+            tabSize[x] = 0
+
+    head = "  firstName" + "\t"*tabSize[0] + "\t"
+    head += "|secondName" + "\t"*tabSize[1] + "\t"
+    head += "|birthdayDate"+"\t"*tabSize[2] +"\t"
+    head += "|namedayDate"+"\t"*tabSize[3] +"\t"
+    head += "|mail"+"\t"*tabSize[4] +"\t"
+    head += "|telNumber"+"\t"*tabSize[5] +"\t"
+    head += "|facebook"+"\t"*tabSize[6] +"\t"
+    head += "|group"
+    print(head)
+
+    print("  "+"-"*8*16)
+
+    for person in db.db:
+        raw = "  "+str(person.firstName)+"\t"*(((16+ tabSize[0]*8)-len(person.firstName))//8)+"\t"+"|"
+        raw += str(person.secondName)+"\t"*(((16+ tabSize[1]*8)-len(person.secondName))//8)+"\t"+"|"
+        raw += str(person.birthdayDate)+"\t"*(((16+ tabSize[2]*8)-len(person.birthdayDate))//8)+"\t"+"|"
+        raw += str(person.namedayDate)+"\t"*(((16+ tabSize[3]*8)-len(person.namedayDate))//8)+"\t"+"|"
+        raw += str(person.mail)+"\t"*(((8+ tabSize[4]*8)-len(person.mail))//8)+"\t"+"|"
+        raw += str(person.telNumber)+"\t"*(((16+ tabSize[5]*8)-len(person.telNumber))//8)+"\t"+"|"
+        raw += str(person.facebook)+"\t"*(((16+ tabSize[6]*8)-len(person.facebook))//8)+"\t"+"|"
         raw += str(person.group)
         print (raw)
 
