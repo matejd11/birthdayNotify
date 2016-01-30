@@ -1,3 +1,6 @@
+import json
+
+
 class Person(object):
     def __init__(self, firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook, group = None):
         if group == None:
@@ -12,6 +15,4 @@ class Person(object):
         self.group = group
 
     def __str__(self):
-        out = "person: "
-        out += self.firstName
-        return out
+        return str(json.dumps(self.__dict__, sort_keys = True, indent = 4))
