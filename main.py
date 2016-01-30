@@ -1,10 +1,10 @@
 from personDb import PersonDb
-import shell
+from shell import Shell
 
 
 def main():
-    data = PersonDb('skuska')
-    shell.go(data)
+    shell = Shell("skuska")
+    shell.go()
 
 if __name__ == '__main__':
     main()

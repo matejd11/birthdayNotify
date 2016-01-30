@@ -17,7 +17,7 @@ class PersonDb(object):
         tmp = set()
         for person in self.db:
             for group in person.group:
-                tmp.append(person)
+                tmp.add(person)
         self.groups = tmp
 
     def add(self, person):
