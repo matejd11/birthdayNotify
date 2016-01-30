@@ -26,7 +26,7 @@ class Shell(object):
 
     def go(self):
         while self.status == 1:
-            inputText = input("command> ").strip()
+            inputText = input("command(" + self.db.dbName + ")> ").strip()
             resArray = {}
             for i in self.commands:
                 res = re.search("^" + inputText + ".*", i)
@@ -66,7 +66,7 @@ class Shell(object):
             print("\t", i, ":",  self.commandsHelp[i])
 
     def add(self):
-        print("add")
+        print("    add")
 
         firstName = input("\tfirstName: ")
         secondName = input("\tsecondName: ")
@@ -81,8 +81,19 @@ class Shell(object):
 
         self.db.add(newPerson)
 
+    def getNumber(self):
+        number = None
+        while number == None or number < 0 or number >= len(self.db.db):
+            try:
+                number = int(input("Insert id to delete(insert -1 to cancel): "))
+            except ValueError:
+                number = None
+        return number
+
     def delete(self):
         self.showTable()
+        number = self.getNumber()
+        self.db.db.pop(number)
 
     def showDb(self):
         for person in self.db.db:
@@ -130,11 +141,9 @@ class Shell(object):
         print(head)
 
         print("  "+"-"*8*16)
-        
+
         space = " "
-        count = 0
-        for person in self.db.db:
-            count += 1
+        for count, person in enumerate(self.db.db):
             raw =" ["+str(count)+"]\t|"+str(person.firstName)+"\t"*ceil(((16+ tabSize[0]*8)-len(person.firstName))/8)+"|"
             raw += str(person.secondName)+"\t"*ceil(((16+ tabSize[1]*8)-len(person.secondName))/8)+"|"
             raw += str(person.birthdayDate)+"\t"*ceil(((16+ tabSize[2]*8)-len(person.birthdayDate))/8)+"|"
