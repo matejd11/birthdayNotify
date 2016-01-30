@@ -57,14 +57,15 @@ def quit(db):
 
 def showTable(db):
     print("\tfirstName\t|secondName\t|birthdayDate\t|namedayDate\t|mail\t\t|telNumber\t|facebook\t|group")
+    print("\t"+"-"*8*16)
     for person in db.db:
-        raw = "\t"+str(person.firstName)+"\t"*((9-len(person.firstName))//4+1)+"|"
-        raw += str(person.secondName)+"\t"*((9-len(person.firstName))//4+1)+"|"
-        raw += str(person.birthdayDate)+"\t"*((9-len(person.firstName))//4+1)+"|"
-        raw += str(person.namedayDate)+"\t"*((9-len(person.firstName))//4+1)+"|"
-        raw += str(person.mail)+"\t"*((9-len(person.firstName))//4+1)+"|"
-        raw += str(person.telNumber)+"\t"*((9-len(person.firstName))//4+1)+"|"
-        raw += str(person.facebook)+"\t"*((9-len(person.firstName))//4+1)+"|"
+        raw = "\t"+str(person.firstName)+"\t"*((16-len(person.firstName))//8+1)+"|"
+        raw += str(person.secondName)+"\t"*((16-len(person.secondName))//8+1)+"|"
+        raw += str(person.birthdayDate)+"\t"*((16-len(person.birthdayDate))//8+1)+"|"
+        raw += str(person.namedayDate)+"\t"*((16-len(person.namedayDate))//8+1)+"|"
+        raw += str(person.mail)+"\t"*((16-len(person.mail))//8+1)+"|"
+        raw += str(person.telNumber)+"\t"*((16-len(person.telNumber))//8+1)+"|"
+        raw += str(person.facebook)+"\t"*((16+len(person.facebook))//8)+"|"
         raw += str(person.group)
         print (raw)
 
