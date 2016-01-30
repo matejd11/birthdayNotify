@@ -1,5 +1,6 @@
 from person import Person
 from personDb import PersonDb
+from math import ceil
 import readline
 import re
 
@@ -14,10 +15,12 @@ class Shell(object):
                         "quit": self.quit,
                         "exit": self.quit,
                         "list": self.showDb,
-                        "table": self.showTable}
+                        "table": self.showTable,
+                        "del": self.delete}
 
         self.commandsHelp = {"help": "help for command help",
                             "add": "help for command add",
+                            "del": "help for command delete",
                             "quit": "help for command quit",
                             "list": "help for command list"}
 
@@ -78,26 +81,15 @@ class Shell(object):
 
         self.db.add(newPerson)
 
+    def delete(self):
+        self.showTable()
+
     def showDb(self):
         for person in self.db.db:
             print(person)
 
     def quit(self):
         self.status = 0
-
-    def showTable(self):
-        print("\tfirstName\t|secondName\t|birthdayDate\t|namedayDate\t|mail\t\t|telNumber\t|facebook\t|group")
-        print("\t"+"-"*8*16)
-        for person in db.db:
-            raw = "\t"+str(person.firstName)+"\t"*((16-len(person.firstName))//8+1)+"|"
-            raw += str(person.secondName)+"\t"*((16-len(person.secondName))//8+1)+"|"
-            raw += str(person.birthdayDate)+"\t"*((16-len(person.birthdayDate))//8+1)+"|"
-            raw += str(person.namedayDate)+"\t"*((16-len(person.namedayDate))//8+1)+"|"
-            raw += str(person.mail)+"\t"*((16-len(person.mail))//8+1)+"|"
-            raw += str(person.telNumber)+"\t"*((16-len(person.telNumber))//8+1)+"|"
-            raw += str(person.facebook)+"\t"*((16+len(person.facebook))//8)+"|"
-            raw += str(person.group)
-            print (raw)
 
     def showTable(self):
         largestStr = {"firstName": 0, 
@@ -115,19 +107,19 @@ class Shell(object):
                     largestStr[index] = len(tmp[index])
 
         tabSize = []
-        tabSize.append((largestStr["firstName"]-16)//8+1)
-        tabSize.append((largestStr["secondName"]-16)//8+1)
-        tabSize.append((largestStr["birthdayDate"]-16)//8+1)
-        tabSize.append((largestStr["namedayDate"]-16)//8+1)
-        tabSize.append((largestStr["mail"]-8)//8+1)
-        tabSize.append((largestStr["telNumber"]-16)//8+1)
-        tabSize.append((largestStr["facebook"]-16)//8+1)
+        tabSize.append(ceil((largestStr["firstName"]-16)/8))
+        tabSize.append(ceil((largestStr["secondName"]-16)/8))
+        tabSize.append(ceil((largestStr["birthdayDate"]-16)/8))
+        tabSize.append(ceil((largestStr["namedayDate"]-16)/8))
+        tabSize.append(ceil((largestStr["mail"]-8)/8))
+        tabSize.append(ceil((largestStr["telNumber"]-16)/8))
+        tabSize.append(ceil((largestStr["facebook"]-16)/8))
 
         for x in range(len(tabSize)):
             if tabSize[x] < 0:
                 tabSize[x] = 0
 
-        head = "  firstName" + "\t"*tabSize[0] + "\t"
+        head = " ID\t|firstName" + "\t"*tabSize[0] + "\t"
         head += "|secondName" + "\t"*tabSize[1] + "\t"
         head += "|birthdayDate"+"\t"*tabSize[2] +"\t"
         head += "|namedayDate"+"\t"*tabSize[3] +"\t"
@@ -138,14 +130,17 @@ class Shell(object):
         print(head)
 
         print("  "+"-"*8*16)
-
+        
+        space = " "
+        count = 0
         for person in self.db.db:
-            raw = "  "+str(person.firstName)+"\t"*(((16+ tabSize[0]*8)-len(person.firstName))//8)+"\t"+"|"
-            raw += str(person.secondName)+"\t"*(((16+ tabSize[1]*8)-len(person.secondName))//8)+"\t"+"|"
-            raw += str(person.birthdayDate)+"\t"*(((16+ tabSize[2]*8)-len(person.birthdayDate))//8)+"\t"+"|"
-            raw += str(person.namedayDate)+"\t"*(((16+ tabSize[3]*8)-len(person.namedayDate))//8)+"\t"+"|"
-            raw += str(person.mail)+"\t"*(((8+ tabSize[4]*8)-len(person.mail))//8)+"\t"+"|"
-            raw += str(person.telNumber)+"\t"*(((16+ tabSize[5]*8)-len(person.telNumber))//8)+"\t"+"|"
-            raw += str(person.facebook)+"\t"*(((16+ tabSize[6]*8)-len(person.facebook))//8)+"\t"+"|"
+            count += 1
+            raw =" ["+str(count)+"]\t|"+str(person.firstName)+"\t"*ceil(((16+ tabSize[0]*8)-len(person.firstName))/8)+"|"
+            raw += str(person.secondName)+"\t"*ceil(((16+ tabSize[1]*8)-len(person.secondName))/8)+"|"
+            raw += str(person.birthdayDate)+"\t"*ceil(((16+ tabSize[2]*8)-len(person.birthdayDate))/8)+"|"
+            raw += str(person.namedayDate)+"\t"*ceil(((16+ tabSize[3]*8)-len(person.namedayDate))/8)+"|"
+            raw += str(person.mail)+"\t"*ceil(((8+ tabSize[4]*8)-len(person.mail))/8)+"|"
+            raw += str(person.telNumber)+"\t"*ceil(((16+ tabSize[5]*8)-len(person.telNumber))/8)+"|"
+            raw += str(person.facebook)+"\t"*ceil(((16+ tabSize[6]*8)-len(person.facebook))/8)+"|"
             raw += str(person.group)
             print (raw)
