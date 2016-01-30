@@ -1,13 +1,16 @@
 from person import Person
+import re
 
 
 def go(db):
     global status
     while status == 1:
         inputText = input("command> ")
+        res = {}
         for i in commands:
-            if inputText == i:
-                commands[i](db)
+            res = re.search("^" + inputText + ".*", i)
+
+            #commands[i](db)
 
 def helpMe(db):
     print("help:")
@@ -39,11 +42,11 @@ def quit(db):
     status = 0
 
 status = 1
-commands = {"h": helpMe, 
-            "a": add, 
-            "q": quit, 
-            "l": showDb}
-commandsHelp = {"h": "help for command help", 
-                "a": "help for command add", 
-                "q": "help for command quit",
-                "l": "help for command list"}
+commands = {"help": helpMe,
+            "add": add,
+            "quit": quit,
+            "list": showDb}
+commandsHelp = {"help": "help for command help",
+                "add": "help for command add",
+                "quit": "help for command quit",
+                "list": "help for command list"}
