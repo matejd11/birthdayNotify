@@ -39,5 +39,11 @@ def quit(db):
     status = 0
 
 status = 1
-commands = {"h": helpMe, "a": add, "q": quit, "l": showDb}
-commandsHelp = {"h": "help for command help", "a": "help for command add", "q": "help for command quit"}
+commands = {"h": helpMe, 
+            "a": add, 
+            "q": quit, 
+            "l": showDb}
+commandsHelp = {"h": "help for command help", 
+                "a": "help for command add", 
+                "q": "help for command quit",
+                "l": "help for command list"}
