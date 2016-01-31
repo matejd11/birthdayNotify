@@ -83,17 +83,24 @@ class Shell(object):
 
     def getNumber(self):
         number = None
-        while number == None or number < 0 or number >= len(self.db.db):
+        while number == None or number < -1 or number >= len(self.db.db):
             try:
                 number = int(input("Insert id to delete(insert -1 to cancel): "))
             except ValueError:
                 number = None
-        return number
+        while True and number != -1:
+            yes = input("Do you want to delete(" + self.db.db[number].firstName + " " + self.db.db[number].secondName +") Y/n: ")
+            if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
+                return number
+            elif yes.lower() == 'n' or yes.lower() == 'no':
+                break
+        return None
 
     def delete(self):
         self.showTable()
         number = self.getNumber()
-        self.db.db.pop(number)
+        if number != None:
+            self.db.db.pop(number)
 
     def showDb(self):
         for person in self.db.db:
