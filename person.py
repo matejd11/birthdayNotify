@@ -1,5 +1,5 @@
 import json
-
+import numpy as np
 
 class Person(object):
     def __init__(self, firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook, group = None):
@@ -7,7 +7,9 @@ class Person(object):
             group = []
         self.firstName = firstName
         self.secondName = secondName
+        self.birthdayDate = np.dtype(np.datetime64)
         self.birthdayDate = birthdayDate
+        self.namedayDate = np.dtype(np.datetime64)
         self.namedayDate = namedayDate
         self.mail = mail
         self.telNumber = telNumber
@@ -15,4 +17,7 @@ class Person(object):
         self.group = group
 
     def __str__(self):
-        return str(json.dumps(self.__dict__, sort_keys = True, indent = 4))
+        me = self.__dict__
+        me["birthdayDate"] = str(me["birthdayDate"])
+        me["namedayDate"] = str(me["namedayDate"])
+        return str(json.dumps(me, sort_keys = True, indent = 4))
