@@ -129,7 +129,12 @@ class Shell(object):
             if facebook == True or sms == True or mail == True or show == True:
                 break
             print("Choose atleast one atribute.")
-        print(name, facebook, sms, mail, show)
+        Atributes = Atribute(name, facebook, sms, mail, show)
+        if namedayDate == True:
+            namedayDate == Atributes
+        if birthdayDate == True:
+            birthdayDate == Atributes
+        newGroup = Group(name, namedayDate, birthdayDate)
 
     def addPerson(self):
         print("    add")
@@ -206,21 +211,35 @@ class Shell(object):
         pass
 
     def showTablePerson(self):
-        largestStr = {"firstName": 0, 
-                    "secondName": 0,
-                    "birthdayDate": 0,
-                    "namedayDate": 0,
-                    "mail": 0,
-                    "telNumber": 0,
-                    "facebook": 0,
-                    "group": 0}
-        for person in self.db.db:
+        head = ["firstName",
+                "secondName",
+                "birthdayDate",
+                "namedayDate",
+                "mail",
+                "telNumber",
+                "facebook",
+                "group"]
+        self.showTable(head, self.db.db)
+
+    def showTable(self, head, content):
+        largestStr = {}
+        length = []
+        for x in head:
+            largestStr[x] = 0
+            if len(x) > 8:
+                length.append(16)
+            else:
+                length.append(8)
+
+        for person in content:
             tmp = person.__dict__
             for index in tmp:
                 if largestStr[index] < len(str(tmp[index])):
                     largestStr[index] = len(str(tmp[index]))
 
         tabSize = []
+        for i in range(len(head)-1):
+            tabSize.append(ceil((largestStr[head[i]]
         tabSize.append(ceil((largestStr["firstName"]-16)/8))
         tabSize.append(ceil((largestStr["secondName"]-16)/8))
         tabSize.append(ceil((largestStr["birthdayDate"]-16)/8))
