@@ -9,25 +9,28 @@ class Shell(object):
     def __init__(self, dbName = "database"):
         self.db = PersonDb(dbName)
         self.status = 1
+        self.mode = 0
         self.commands = {"help": self.helpMe,
-                        "add": self.add,
+                        "add": [self.addPerson, self.addGroup],
                         "save": self.saveDb,
                         "load": self.loadDb,
                         "quit": self.quit,
                         "exit": self.quit,
-                        "list": self.showDb,
-                        "table": self.showTable,
-                        "del": self.delete}
+                        "list": [self.showDbPerson, self.showDbGroup],
+                        "table": [self.showTablePerson, self.showTableGroup],
+                        "mode": self.changeMode,
+                        "del": [self.deletePerson, self.deleteGroup]}
 
         self.commandsHelp = ["help\t: show help for commands",
-                            "add\t: add person in database",
-                            "del\t: delete person from database",
-                            "quit\t: quit shell",
-                            "exit\t: quit shell",
-                            "list\t: print people in database",
-                            "table\t: print database table",
+                            "mode 0/1\t: 0 for person 1 for group",
+                            "\tadd\t: add mode in database",
+                            "\tdel\t: delete mode from database",
+                            "\tlist\t: print mode in database",
+                            "\ttable\t: print mode database table",
                             "save\t: save changes in database",
-                            "load\t: load database"]
+                            "load\t: load database",
+                            "quit\t: quit shell",
+                            "exit\t: quit shell"]
 
     def go(self):
         while self.status == 1:
@@ -43,7 +46,11 @@ class Shell(object):
                     candidate.append(i)
 
             if len(candidate) == 1:
-                self.commands[candidate[0]]()
+                try:
+                    type(self.commands[candidate[0]])
+                    self.commands[candidate[0]][int(self.mode)]()
+                except TypeError:
+                    self.commands[candidate[0]]()
             elif len(candidate) > 1 and not(not inputText):
                 print("do you mean:")
                 for can in candidate:
@@ -70,7 +77,20 @@ class Shell(object):
         for command in self.commandsHelp:
             print("\t", command)
 
-    def add(self):
+    def changeMode(self):
+        while True:
+            self.mode = (input("\tChange mode to 0 = Person or 1 = Group: "))
+            if self.mode == "0":
+                print("Mode has been changed to Person")
+                break
+            if self.mode == "1":
+                print("Mode has been changed to Group")
+                break
+
+    def addGroup(self):
+        pass
+
+    def addPerson(self):
         print("    add")
 
         firstName = input("\tfirstName: ")
@@ -105,7 +125,7 @@ class Shell(object):
 
         newPerson = Person(firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook)
 
-        self.db.add(newPerson)
+        self.db.addPerson(newPerson)
 
     def getNumber(self):
         number = None
@@ -122,20 +142,29 @@ class Shell(object):
                 break
         return None
 
-    def delete(self):
-        self.showTable()
+    def deleteGroup(self):
+        pass
+
+    def deletePerson(self):
+        self.showTablePerson()
         number = self.getNumber()
         if number != None:
             self.db.db.pop(number)
 
-    def showDb(self):
+    def showDbGroup(self):
+        pass
+
+    def showDbPerson(self):
         for person in self.db.db:
             print(person)
 
     def quit(self):
         self.status = 0
 
-    def showTable(self):
+    def showTableGroup(self):
+        pass
+
+    def showTablePerson(self):
         largestStr = {"firstName": 0, 
                     "secondName": 0,
                     "birthdayDate": 0,
