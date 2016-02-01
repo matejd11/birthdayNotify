@@ -2,6 +2,14 @@ import json
 import numpy as np
 
 class Person(object):
+    order = ["firstName",
+            "secondName",
+            "birthdayDate",
+            "namedayDate",
+            "mail",
+            "telNumber",
+            "facebook",
+            "group"]
     def __init__(self, firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook, group = None):
         if group == None:
             group = []

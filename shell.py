@@ -11,7 +11,7 @@ class Shell(object):
     def __init__(self, dbName = "database"):
         self.db = PersonDb(dbName)
         self.status = 1
-        self.mode = 1
+        self.mode = 0
         self.commands = {"help": self.helpMe,
                         "add": [self.addPerson, self.addGroup],
                         "save": self.saveDb,
@@ -213,65 +213,43 @@ class Shell(object):
     def showTablePerson(self):
         head = ["firstName",
                 "secondName",
-                "birthdayDate",
+                "1234birthdayDate",
                 "namedayDate",
                 "mail",
                 "telNumber",
                 "facebook",
                 "group"]
-        self.showTable(head, self.db.db)
+        self.showTable(head, self.db.db, Person.order)
 
-    def showTable(self, head, content):
+    def showTable(self, head, content, order):
         largestStr = {}
         length = []
         for x in head:
             largestStr[x] = 0
-            if len(x) > 8:
-                length.append(16)
-            else:
-                length.append(8)
+            length.append(8*(len(x)//8)+8)
 
         for person in content:
             tmp = person.__dict__
-            for index in tmp:
-                if largestStr[index] < len(str(tmp[index])):
-                    largestStr[index] = len(str(tmp[index]))
+            for i in range(len(order)):
+                if largestStr[head[i]] < len(str(tmp[order[i]])):
+                    largestStr[head[i]] = len(str(tmp[order[i]]))
 
         tabSize = []
+        headStr = " ID\t"
         for i in range(len(head)-1):
-            tabSize.append(ceil((largestStr[head[i]]
-        tabSize.append(ceil((largestStr["firstName"]-16)/8))
-        tabSize.append(ceil((largestStr["secondName"]-16)/8))
-        tabSize.append(ceil((largestStr["birthdayDate"]-16)/8))
-        tabSize.append(ceil((largestStr["namedayDate"]-16)/8))
-        tabSize.append(ceil((largestStr["mail"]-8)/8))
-        tabSize.append(ceil((largestStr["telNumber"]-16)/8))
-        tabSize.append(ceil((largestStr["facebook"]-16)/8))
+            tabSize.append(ceil((largestStr[head[i]]-length[i])/8))
+            if tabSize[i] < 0:
+                tabSize[i] = 0
+            headStr += "|"+head[i]+ "\t"*tabSize[i] + "\t"
+        headStr += "|"+head[-1]
+        print(headStr)
 
-        for x in range(len(tabSize)):
-            if tabSize[x] < 0:
-                tabSize[x] = 0
+        print(" "+"-"*8*17)
 
-        head = " ID\t|firstName" + "\t"*tabSize[0] + "\t"
-        head += "|secondName" + "\t"*tabSize[1] + "\t"
-        head += "|birthdayDate"+"\t"*tabSize[2] +"\t"
-        head += "|namedayDate"+"\t"*tabSize[3] +"\t"
-        head += "|mail"+"\t"*tabSize[4] +"\t"
-        head += "|telNumber"+"\t"*tabSize[5] +"\t"
-        head += "|facebook"+"\t"*tabSize[6] +"\t"
-        head += "|group"
-        print(head)
-
-        print("  "+"-"*8*16)
-
-        space = " "
-        for count, person in enumerate(self.db.db):
-            raw =" ["+str(count)+"]\t|"+str(person.firstName)+"\t"*ceil(((16+ tabSize[0]*8)-len(person.firstName))/8)+"|"
-            raw += str(person.secondName)+"\t"*ceil(((16+ tabSize[1]*8)-len(person.secondName))/8)+"|"
-            raw += str(person.birthdayDate)+"\t"*ceil(((16+ tabSize[2]*8)-len(str(person.birthdayDate)))/8)+"|"
-            raw += str(person.namedayDate)+"\t"*ceil(((16+ tabSize[3]*8)-len(str(person.namedayDate)))/8)+"|"
-            raw += str(person.mail)+"\t"*ceil(((8+ tabSize[4]*8)-len(person.mail))/8)+"|"
-            raw += str(person.telNumber)+"\t"*ceil(((16+ tabSize[5]*8)-len(str(person.telNumber)))/8)+"|"
-            raw += str(person.facebook)+"\t"*ceil(((16+ tabSize[6]*8)-len(person.facebook))/8)+"|"
-            raw += str(person.group)
+        for count, person in enumerate(content):
+            tmp = person.__dict__
+            raw =" ["+str(count)+"]\t|"
+            for i in range(len(order)-1):
+                raw += str(tmp[order[i]])+"\t"*ceil(((length[i]+ tabSize[i]*8)-len(str(tmp[order[i]])))/8)+"|"
+            raw += str(tmp[order[-1]])
             print (raw)
