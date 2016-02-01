@@ -23,12 +23,16 @@ class PersonDb(object):
     def add(self, person):
         self.db.append(person)
 
-    def save(data, fileName = 'database'):
+    def save(data, fileName = None):
+        if fileName == None:
+            fileName = self.dbName
         filen = PersonDb.fileExtension(fileName)
         with open(filen,"wb") as pickleOut:
             pickle.dump(data, pickleOut)
 
-    def load(fileName = 'database'):
+    def load(fileName = None):
+        if fileName == None:
+            fileName = self.dbName
         filen = PersonDb.fileExtension(fileName)
         try:
             with open(filen, "rb") as pickleIn:
