@@ -1,4 +1,6 @@
 from person import Person
+from group import Group
+from atributes import Atribute
 from personDb import PersonDb
 from math import ceil
 import numpy as np
@@ -9,7 +11,7 @@ class Shell(object):
     def __init__(self, dbName = "database"):
         self.db = PersonDb(dbName)
         self.status = 1
-        self.mode = 0
+        self.mode = 1
         self.commands = {"help": self.helpMe,
                         "add": [self.addPerson, self.addGroup],
                         "save": self.saveDb,
@@ -93,8 +95,41 @@ class Shell(object):
             except ValueError:
                 pass
 
+    def checkBox(self, text):
+        while True:
+            check = input(text)
+            try:
+                check = int(check)
+                if check == 0:
+                    return False
+                if check == 1:
+                    return True
+            except ValueError:
+                if check == "":
+                    return False
+            
+
     def addGroup(self):
-        pass
+        print("    add")
+        name = input("    groupName: ")
+        print("\t#use 1: yes 0: no")
+        print("\tAssign atributes for:")
+        while True:
+            namedayDate = self.checkBox("\t  namedayDate: ")
+            birthdayDate = self.checkBox("\t  birthdayDate: ")
+            if birthdayDate == True or namedayDate == True:
+                break
+            print("Choose atleast one. Atributes can't be assigned to nothing.")
+        print("\tAtributes:")
+        while True:
+            facebook = self.checkBox("\t  send by Facebook: ")
+            sms = self.checkBox("\t  send by sms: ")
+            mail = self.checkBox("\t  send by e-mail: ")
+            show = self.checkBox("\t  show message: ")
+            if facebook == True or sms == True or mail == True or show == True:
+                break
+            print("Choose atleast one atribute.")
+        print(name, facebook, sms, mail, show)
 
     def addPerson(self):
         print("    add")
