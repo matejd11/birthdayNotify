@@ -34,7 +34,7 @@ class Shell(object):
 
     def go(self):
         while self.status == 1:
-            inputText = input("command(" + self.db.dbName + ")> ").strip()
+            inputText = input("command(" + self.db.dbName + "|" + str(self.modeName()) + ")> ").strip()
             resArray = {}
             for i in self.commands:
                 res = re.search("^" + inputText + ".*", i)
@@ -58,6 +58,12 @@ class Shell(object):
             elif not(not inputText):
                 print("use h/help for help.")
 
+    def modeName(self):
+        if self.mode == 0:
+            return "person"
+        if self.mode == 1:
+            return "group"
+
     def getDbName(self):
         name = input("\tEnter name of DB(leave blank for `" + self.db.dbName + "`): ")
         if not name:
@@ -79,11 +85,11 @@ class Shell(object):
 
     def changeMode(self):
         while True:
-            self.mode = (input("\tChange mode to 0 = Person or 1 = Group: "))
-            if self.mode == "0":
+            self.mode = int(input("\tChange mode to 0 = Person or 1 = Group: "))
+            if self.mode == 0:
                 print("Mode has been changed to Person")
                 break
-            if self.mode == "1":
+            if self.mode == 1:
                 print("Mode has been changed to Group")
                 break
 
