@@ -176,7 +176,7 @@ class Shell(object):
 
         newPerson = Person(firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook)
 
-        self.db.addPerson(newPerson)
+        self.db.add(newPerson)
 
     def getNumber(self):
         number = None
