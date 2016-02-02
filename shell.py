@@ -48,10 +48,9 @@ class Shell(object):
                     candidate.append(i)
 
             if len(candidate) == 1:
-                try:
-                    type(self.commands[candidate[0]])
+                if type(self.commands[candidate[0]]) == list:
                     self.commands[candidate[0]][int(self.mode)]()
-                except TypeError:
+                else:
                     self.commands[candidate[0]]()
             elif len(candidate) > 1 and not(not inputText):
                 print("do you mean:")
@@ -199,9 +198,9 @@ class Shell(object):
 
     def deletePerson(self):
         self.showTablePerson()
-        number = self.getNumber(self.db.personDb)
+        number = self.getNumber(self.db.personDb.db)
         if number != None:
-            self.db.personDb.romeve(number)
+            self.db.personDb.remove(number)
 
     def showDbGroup(self):
         pass

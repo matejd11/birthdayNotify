@@ -17,6 +17,10 @@ class PersonDb(object):
         self.isChanged = True
         self.db.append(person)
 
+    def remove(self, index):
+        self.isChanged = True
+        self.db.pop(index)
+
     def edit(self, person, newPerson):
         self.isChanged = True
         self.db.index(person)
