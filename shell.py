@@ -1,7 +1,7 @@
 from person import Person
 from group import Group
 from atributes import Atribute
-from personDb import PersonDb
+from fakeDb import FakeDb
 from math import ceil
 import numpy as np
 import readline
@@ -9,7 +9,7 @@ import re
 
 class Shell(object):
     def __init__(self, dbName = "database"):
-        self.db = PersonDb(dbName)
+        self.db = FakeDb(dbName)
         self.status = 1
         self.mode = 0
         self.commands = {"help": self.helpMe,
@@ -74,11 +74,11 @@ class Shell(object):
 
     def saveDb(self):
         name = self.getDbName()
-        PersonDb.save(self.db.db, name)
+        self.db.save(name)
 
     def loadDb(self):
         name = self.getDbName()
-        self.db = PersonDb(name)
+        self.db = FakeDb(name)
 
     def helpMe(self):
         print("    help:")
@@ -200,13 +200,13 @@ class Shell(object):
         self.showTablePerson()
         number = self.getNumber()
         if number != None:
-            self.db.db.pop(number)
+            self.db.personDb.romeve(number)
 
     def showDbGroup(self):
         pass
 
     def showDbPerson(self):
-        for person in self.db.db:
+        for person in self.db.personDb.db:
             print(person)
 
     def quit(self):

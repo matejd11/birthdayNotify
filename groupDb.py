@@ -2,8 +2,8 @@ import pickle
 import os
 
 
-class PersonDb(object):
-    def __init__(self, dbName, autoload = True):
+class GroupDb(object):
+    def __init__(self, dbName, autoload = False):
         self.dbName = dbName
         self.db = None
         self.isChanged = False
@@ -13,14 +13,14 @@ class PersonDb(object):
     def setup(self):
         self.db = self.load(self.dbName)
 
-    def add(self, person):
+    def add(self, group):
         self.isChanged = True
-        self.db.append(person)
+        self.db.append(group)
 
-    def edit(self, person, newPerson):
+    def edit(self, group, newGroup):
         self.isChanged = True
-        self.db.index(person)
-        self.db[index] = newPerson
+        self.db.index(group)
+        self.db[index] = newGroup
 
     def save(self, data, fileName = None):
         if fileName == None:
