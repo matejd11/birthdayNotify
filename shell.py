@@ -108,33 +108,38 @@ class Shell(object):
                 if check == "":
                     return False
             
+    def addAtributes(self, name):
+        print("\t\tAtributes for "+name)
+        while True:
+            facebook = self.checkBox("\t\t  send by Facebook: ")
+            sms = self.checkBox("\t\t  send by sms: ")
+            mail = self.checkBox("\t\t  send by e-mail: ")
+            show = self.checkBox("\t\t  show message: ")
+            if facebook == True or sms == True or mail == True or show == True:
+                break
+            print("Choose atleast one atribute.")
+        return Atribute(name, facebook, sms, mail, show)
 
     def addGroup(self):
         print("    add")
         name = input("    groupName: ")
         print("\t#use 1: yes 0: no")
-        print("\tAssign atributes for:")
+        print("\tAssign atributes to")
         while True:
+            namedayAtr = False
+            birthdayAtr = False
+
             namedayDate = self.checkBox("\t  namedayDate: ")
+            if namedayDate == True:
+                namedayAtr = self.addAtributes(name+"Nameday")
             birthdayDate = self.checkBox("\t  birthdayDate: ")
+            if birthdayDate == True:
+                birthdayAtr = self.addAtributes(name+"Birthday")
+
             if birthdayDate == True or namedayDate == True:
                 break
             print("Choose atleast one. Atributes can't be assigned to nothing.")
-        print("\tAtributes:")
-        while True:
-            facebook = self.checkBox("\t  send by Facebook: ")
-            sms = self.checkBox("\t  send by sms: ")
-            mail = self.checkBox("\t  send by e-mail: ")
-            show = self.checkBox("\t  show message: ")
-            if facebook == True or sms == True or mail == True or show == True:
-                break
-            print("Choose atleast one atribute.")
-        Atributes = Atribute(name, facebook, sms, mail, show)
-        if namedayDate == True:
-            namedayDate == Atributes
-        if birthdayDate == True:
-            birthdayDate == Atributes
-        newGroup = Group(name, namedayDate, birthdayDate)
+        newGroup = Group(name, namedayAtr, birthdayAtr)
 
     def addPerson(self):
         print("    add")
