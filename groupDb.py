@@ -22,11 +22,11 @@ class GroupDb(object):
         self.db.index(group)
         self.db[index] = newGroup
 
-    def save(self, data, fileName = None):
+    def save(self, fileName = None):
         if fileName == None:
             fileName = self.dbName
         with open(fileName,"wb") as pickleOut:
-            pickle.dump(data, pickleOut)
+            pickle.dump(self.db, pickleOut)
             self.dbName = fileName
             self.isChanged = False
 

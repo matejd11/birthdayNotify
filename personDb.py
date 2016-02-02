@@ -22,11 +22,11 @@ class PersonDb(object):
         self.db.index(person)
         self.db[index] = newPerson
 
-    def save(self, data, fileName = None):
+    def save(self, fileName = None):
         if fileName == None:
             fileName = self.dbName
         with open(fileName,"wb") as pickleOut:
-            pickle.dump(data, pickleOut)
+            pickle.dump(self.db, pickleOut)
             self.dbName = fileName
             self.isChanged = False
 
