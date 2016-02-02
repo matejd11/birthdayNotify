@@ -78,7 +78,8 @@ class Shell(object):
 
     def loadDb(self):
         name = self.getDbName()
-        self.db = FakeDb(name)
+        self.db.load(name)
+        #self.db = FakeDb(name)
 
     def helpMe(self):
         print("    help:")
@@ -178,15 +179,15 @@ class Shell(object):
 
         self.db.personDb.add(newPerson)
 
-    def getNumber(self):
+    def getNumber(self, db):
         number = None
-        while number == None or number < -1 or number >= len(self.db.db):
+        while number == None or number < -1 or number >= len(db):
             try:
                 number = int(input("Insert id to delete(insert -1 to cancel): "))
             except ValueError:
                 number = None
         while True and number != -1:
-            yes = input("Do you want to delete(" + self.db.db[number].firstName + " " + self.db.db[number].secondName +") Y/n: ")
+            yes = input("Do you want to delete(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
             if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                 return number
             elif yes.lower() == 'n' or yes.lower() == 'no':
@@ -198,7 +199,7 @@ class Shell(object):
 
     def deletePerson(self):
         self.showTablePerson()
-        number = self.getNumber()
+        number = self.getNumber(self.db.personDb)
         if number != None:
             self.db.personDb.romeve(number)
 
@@ -218,13 +219,13 @@ class Shell(object):
     def showTablePerson(self):
         head = ["firstName",
                 "secondName",
-                "1234birthdayDate",
+                "birthdayDate",
                 "namedayDate",
                 "mail",
                 "telNumber",
                 "facebook",
                 "group"]
-        self.showTable(head, self.db.db, Person.order)
+        self.showTable(head, self.db.personDb.db, Person.order)
 
     def showTable(self, head, content, order):
         largestStr = {}
