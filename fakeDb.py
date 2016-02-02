@@ -6,7 +6,7 @@ from groupDb import GroupDb
 class FakeDb(object):
     def __init__(self, dbName, autoload = True):
         self.dbName = dbName
-        sel.setDbNames(dbName)
+        self.setDbNames(dbName)
         self.personDb = PersonDb(self.personDbName, autoload)
         self.grouDb = GroupDb(self.groupDbName, autoload)
         if autoload:
