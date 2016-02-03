@@ -12,7 +12,7 @@ class Person(object):
             "group"]
     def __init__(self, firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook, group = None):
         if group == None:
-            group = []
+            group = "None"
         self.firstName = firstName
         self.secondName = secondName
         self.birthdayDate = np.dtype(np.datetime64)

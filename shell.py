@@ -18,6 +18,7 @@ class Shell(object):
                         "load": self.loadDb,
                         "quit": self.quit,
                         "exit": self.quit,
+                        "edit": [self.editPerson, self.editGroup],
                         "list": [self.showDbPerson, self.showDbGroup],
                         "table": [self.showTablePerson, self.showTableGroup],
                         "mode": self.changeMode,
@@ -27,6 +28,7 @@ class Shell(object):
                             "mode 0/1\t: 0 for person 1 for group",
                             "\tadd\t: add mode in database",
                             "\tdel\t: delete mode from database",
+                            "\tdel\t: edit mode in database",
                             "\tlist\t: print mode in database",
                             "\ttable\t: print mode database table",
                             "save\t: save changes in database",
@@ -140,6 +142,7 @@ class Shell(object):
                 break
             print("Choose atleast one. Atributes can't be assigned to nothing.")
         newGroup = Group(name, namedayAtr, birthdayAtr)
+        self.db.groupDb.add(newGroup)
 
     def addPerson(self):
         print("    add")
@@ -178,32 +181,53 @@ class Shell(object):
 
         self.db.personDb.add(newPerson)
 
-    def getNumber(self, db):
+    def getNumber(self, db, reason):
         number = None
         while number == None or number < -1 or number >= len(db):
             try:
-                number = int(input("Insert id to delete(insert -1 to cancel): "))
+                number = int(input("Insert id to "+reason+"(insert -1 to cancel): "))
             except ValueError:
                 number = None
         while True and number != -1:
-            yes = input("Do you want to delete(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
+            if self.mode == 0:
+                yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
+            if self.mode == 1:
+                yes = input("Do you want to "+reason+"(" + db[number].name + ") Y/n: ")
             if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                 return number
             elif yes.lower() == 'n' or yes.lower() == 'no':
                 break
         return None
 
+    def editGroup(self):
+        self.showTableGroup()
+        number = self.getNumber(self.db.groupDb.db, "edit")
+        if number != None:
+            self.addGroup()
+            self.db.groupDb.remove(number)
+
+    def editPerson(self):
+        self.showTablePerson()
+        number = self.getNumber(self.db.personDb.db, "edit")
+        if number != None:
+            self.addPerson()
+            self.db.personDb.remove(number)
+
     def deleteGroup(self):
-        pass
+        self.showTableGroup()
+        number = self.getNumber(self.db.groupDb.db, "delete")
+        if number != None:
+            self.db.groupDb.remove(number)
 
     def deletePerson(self):
         self.showTablePerson()
-        number = self.getNumber(self.db.personDb.db)
+        number = self.getNumber(self.db.personDb.db, "delete")
         if number != None:
             self.db.personDb.remove(number)
 
     def showDbGroup(self):
-        pass
+        for group in self.db.groupDb.db:
+            print(group)
 
     def showDbPerson(self):
         for person in self.db.personDb.db:
@@ -213,7 +237,17 @@ class Shell(object):
         self.status = 0
 
     def showTableGroup(self):
-        pass
+        head = ["Group name",
+                "Facebook",
+                "Sms",
+                "Mail",
+                "Show"]
+        
+        content = []
+        for group in (self.db.groupDb.db):
+            content.append(group.convert())
+
+        self.showTable(head, content, Group.order)
 
     def showTablePerson(self):
         head = ["firstName",
@@ -224,17 +258,21 @@ class Shell(object):
                 "telNumber",
                 "facebook",
                 "group"]
-        self.showTable(head, self.db.personDb.db, Person.order)
+
+        content = []
+        for person in self.db.personDb.db:
+            content.append(person.__dict__)
+
+        self.showTable(head, content, Person.order)
 
     def showTable(self, head, content, order):
         largestStr = {}
         length = []
         for x in head:
             largestStr[x] = 0
-            length.append(8*(len(x)//8)+8)
+            length.append(8*((1+len(x))//8)+8)
 
-        for person in content:
-            tmp = person.__dict__
+        for tmp in content:
             for i in range(len(order)):
                 if largestStr[head[i]] < len(str(tmp[order[i]])):
                     largestStr[head[i]] = len(str(tmp[order[i]]))
@@ -242,7 +280,7 @@ class Shell(object):
         tabSize = []
         headStr = " ID\t"
         for i in range(len(head)-1):
-            tabSize.append(ceil((largestStr[head[i]]-length[i])/8))
+            tabSize.append(ceil((largestStr[head[i]]+1-length[i])/8))
             if tabSize[i] < 0:
                 tabSize[i] = 0
             headStr += "|"+head[i]+ "\t"*tabSize[i] + "\t"
@@ -251,10 +289,9 @@ class Shell(object):
 
         print(" "+"-"*8*17)
 
-        for count, person in enumerate(content):
-            tmp = person.__dict__
+        for count, tmp in enumerate(content):
             raw =" ["+str(count)+"]\t|"
             for i in range(len(order)-1):
-                raw += str(tmp[order[i]])+"\t"*ceil(((length[i]+ tabSize[i]*8)-len(str(tmp[order[i]])))/8)+"|"
+                raw += str(tmp[order[i]])+"\t"*ceil(((length[i]+ tabSize[i]*8)-1-len(str(tmp[order[i]])))/8)+"|"
             raw += str(tmp[order[-1]])
-            print (raw)
+            print(raw)

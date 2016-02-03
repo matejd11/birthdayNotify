@@ -8,7 +8,7 @@ class FakeDb(object):
         self.dbName = dbName
         self.setDbNames(dbName)
         self.personDb = PersonDb(self.personDbName, autoload)
-        self.grouDb = GroupDb(self.groupDbName, autoload)
+        self.groupDb = GroupDb(self.groupDbName, autoload)
         if autoload:
             self.setup()
 
@@ -21,7 +21,7 @@ class FakeDb(object):
         self.setDbNames(fileName)
 #change to _save
         self.personDb.save(self.personDbName)
-        self.grouDb.save(self.groupDbName)
+        self.groupDb.save(self.groupDbName)
 
     def load(self, fileName = None):
         if fileName == None:
@@ -29,7 +29,7 @@ class FakeDb(object):
         self.setDbNames(fileName)
 #change to _save
         self.personDb.load(self.personDbName)
-        self.grouDb.load(self.groupDbName)
+        self.groupDb.load(self.groupDbName)
 
     def setDbNames(self, dbName):
         self.personDbName = FakeDb.fileExtension(dbName + ".p")
