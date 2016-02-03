@@ -1,6 +1,7 @@
 from person import Person
 from group import Group
 from atributes import Atribute
+from event import Event
 from fakeDb import FakeDb
 from math import ceil
 import numpy as np
@@ -13,19 +14,19 @@ class Shell(object):
         self.status = 1
         self.mode = 0
         self.commands = {"help": self.helpMe,
-                        "add": [self.addPerson, self.addGroup],
+                        "add": [self.addPerson, self.addGroup, self.addEvent],
                         "save": self.saveDb,
                         "load": self.loadDb,
                         "quit": self.quit,
                         "exit": self.quit,
-                        "edit": [self.editPerson, self.editGroup],
-                        "list": [self.showDbPerson, self.showDbGroup],
-                        "table": [self.showTablePerson, self.showTableGroup],
+                        "edit": [self.editPerson, self.editGroup, self.editEvent],
+                        "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent],
+                        "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent],
                         "mode": self.changeMode,
-                        "del": [self.deletePerson, self.deleteGroup]}
+                        "del": [self.deletePerson, self.deleteGroup, self.deleteEvent]}
 
         self.commandsHelp = ["help\t: show help for commands",
-                            "mode 0/1\t: 0 for person 1 for group",
+                            "mode\t: switch bettween modes",
                             "\tadd\t: add mode in database",
                             "\tdel\t: delete mode from database",
                             "\tdel\t: edit mode in database",
@@ -66,6 +67,8 @@ class Shell(object):
             return "Person"
         if self.mode == 1:
             return "Group"
+        if self.mode == 2:
+            return "Event"
 
     def getDbName(self):
         name = input("\tEnter name of DB(leave blank for `" + self.db.dbName + "`): ")
@@ -90,8 +93,8 @@ class Shell(object):
     def changeMode(self):
         while True:
             try:
-                self.mode = int(input("\tChange mode to 0 = Person or 1 = Group: "))
-                if self.mode == 0 or self.mode == 1:
+                self.mode = int(input("\tChange mode to 0 = Person or 1 = Group or 2 = Event: "))
+                if self.mode == 0 or self.mode == 1 or self.mode == 2:
                     print("\tMode has been changed to ", self.modeName())
                     break
             except ValueError:
@@ -110,8 +113,8 @@ class Shell(object):
                 if check == "":
                     return False
             
-    def addAtributes(self, name):
-        print("\t\tAtributes for "+name)
+    def addAtributes(self, event):
+        print("\t\tAtributes for "+event.name)
         while True:
             facebook = self.checkBox("\t\t  send by Facebook: ")
             sms = self.checkBox("\t\t  send by sms: ")
@@ -120,28 +123,34 @@ class Shell(object):
             if facebook == True or sms == True or mail == True or show == True:
                 break
             print("Choose atleast one atribute.")
-        return Atribute(name, facebook, sms, mail, show)
+        return Atribute(event, facebook, sms, mail, show)
+
+    def addEvent(self):
+        name = input("\teventName: ")
+        shortcut = input("\teventShortcut: ")
+        newEvent = Event(name, shortcut)
+        self.db.eventDb.add(newEvent)
 
     def addGroup(self):
-        print("    add")
+        nameday = Event("nameday", "ND")
+        birthday = Event("birthday", "BD")
         name = input("    groupName: ")
         print("\t#use 1: yes 0: no")
         print("\tAssign atributes to")
+        eventsAtr = []
         while True:
-            namedayAtr = False
-            birthdayAtr = False
+            check =False
+            for event in self.db.eventDb.db:
+                check = self.checkBox("\t  "+event.name+": ")
+                if check == True:
+                    eventAtr = self.addAtributes(event)
+                    eventsAtr.append(eventAtr)
 
-            namedayDate = self.checkBox("\t  namedayDate: ")
-            if namedayDate == True:
-                namedayAtr = self.addAtributes(name+"Nameday")
-            birthdayDate = self.checkBox("\t  birthdayDate: ")
-            if birthdayDate == True:
-                birthdayAtr = self.addAtributes(name+"Birthday")
-
-            if birthdayDate == True or namedayDate == True:
+            if check == True:
                 break
             print("Choose atleast one. Atributes can't be assigned to nothing.")
-        newGroup = Group(name, namedayAtr, birthdayAtr)
+
+        newGroup = Group(name, eventsAtr)
         self.db.groupDb.add(newGroup)
 
     def addPerson(self):
@@ -198,6 +207,9 @@ class Shell(object):
             elif yes.lower() == 'n' or yes.lower() == 'no':
                 break
         return None
+    
+    def editEvent(self):
+        pass
 
     def editGroup(self):
         self.showTableGroup()
@@ -212,6 +224,9 @@ class Shell(object):
         if number != None:
             self.addPerson()
             self.db.personDb.remove(number)
+    
+    def deleteEvent(self):
+        pass
 
     def deleteGroup(self):
         self.showTableGroup()
@@ -225,6 +240,9 @@ class Shell(object):
         if number != None:
             self.db.personDb.remove(number)
 
+    def showDbEvent(self):
+        pass
+
     def showDbGroup(self):
         for group in self.db.groupDb.db:
             print(group)
@@ -235,6 +253,16 @@ class Shell(object):
 
     def quit(self):
         self.status = 0
+
+    def showTableEvent(self):
+        head = ["Event name",
+                "Shortcut",]
+        
+        content = []
+        for event in self.db.eventDb.db:
+            content.append(event.__dict__)
+
+        self.showTable(head, content, Event.order)
 
     def showTableGroup(self):
         head = ["Group name",

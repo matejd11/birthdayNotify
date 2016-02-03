@@ -1,3 +1,4 @@
+from event import Event
 
 class Group(object):
     order = ["name",
@@ -5,32 +6,23 @@ class Group(object):
              "sms",
              "mail",
              "show"]
-    def __init__(self, name, namedayAtr, birthdayAtr):
+    def __init__(self, name, eventsAtr):
         self.name = name
-        self.namedayAtr = namedayAtr
-        self.birthdayAtr = birthdayAtr
+        self.eventsAtr = eventsAtr
 
     def convert(self):
         dictionary = {}
         dictionary["name"] = self.name
 
-        if self.namedayAtr != False:
-            markDict = self.namedayAtr.__dict__
-            for atr in range(1, len(self.order)): 
-                if markDict[self.order[atr]] == True:
-                    dictionary[self.order[atr]] = "ND"
-                else:
-                    dictionary[self.order[atr]] = ""
-
-        if self.birthdayAtr != False:
-            markDict = self.birthdayAtr.__dict__
-            for atr in range(1, len(self.order)): 
+        for eventAtr in self.eventsAtr:
+            markDict = eventAtr.__dict__
+            for atr in range(1, len(self.order)):
+                dictionary[self.order[atr]] = ""
                 if markDict[self.order[atr]] == True:
                     if dictionary[self.order[atr]] != "":
-                        dictionary[self.order[atr]] += ", BD"
-                    else:    
-                        dictionary[self.order[atr]] = "BD"
-
+                        dictionary[self.order[atr]] += ", "+eventAtr.event.shortcut    
+                    else:
+                        dictionary[self.order[atr]] = eventAtr.event.shortcut
         return dictionary
 
     def __str__(self):
