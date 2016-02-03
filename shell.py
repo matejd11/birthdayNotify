@@ -11,13 +11,14 @@ class Shell(object):
     def __init__(self, dbName = "database"):
         self.db = FakeDb(dbName)
         self.status = 1
-        self.mode = 1
+        self.mode = 0
         self.commands = {"help": self.helpMe,
                         "add": [self.addPerson, self.addGroup],
                         "save": self.saveDb,
                         "load": self.loadDb,
                         "quit": self.quit,
                         "exit": self.quit,
+                        "edit": [self.editPerson, self.editGroup],
                         "list": [self.showDbPerson, self.showDbGroup],
                         "table": [self.showTablePerson, self.showTableGroup],
                         "mode": self.changeMode,
@@ -27,6 +28,7 @@ class Shell(object):
                             "mode 0/1\t: 0 for person 1 for group",
                             "\tadd\t: add mode in database",
                             "\tdel\t: delete mode from database",
+                            "\tdel\t: edit mode in database",
                             "\tlist\t: print mode in database",
                             "\ttable\t: print mode database table",
                             "save\t: save changes in database",
@@ -179,33 +181,47 @@ class Shell(object):
 
         self.db.personDb.add(newPerson)
 
-    def getNumber(self, db):
+    def getNumber(self, db, reason):
         number = None
         while number == None or number < -1 or number >= len(db):
             try:
-                number = int(input("Insert id to delete(insert -1 to cancel): "))
+                number = int(input("Insert id to "+reason+"(insert -1 to cancel): "))
             except ValueError:
                 number = None
         while True and number != -1:
             if self.mode == 0:
-                yes = input("Do you want to delete(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
+                yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
             if self.mode == 1:
-                yes = input("Do you want to delete(" + db[number].name + ") Y/n: ")
+                yes = input("Do you want to "+reason+"(" + db[number].name + ") Y/n: ")
             if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                 return number
             elif yes.lower() == 'n' or yes.lower() == 'no':
                 break
         return None
 
+    def editGroup(self):
+        self.showTableGroup()
+        number = self.getNumber(self.db.groupDb.db, "edit")
+        if number != None:
+            self.addGroup()
+            self.db.groupDb.remove(number)
+
+    def editPerson(self):
+        self.showTablePerson()
+        number = self.getNumber(self.db.personDb.db, "edit")
+        if number != None:
+            self.addPerson()
+            self.db.personDb.remove(number)
+
     def deleteGroup(self):
         self.showTableGroup()
-        number = self.getNumber(self.db.groupDb.db)
+        number = self.getNumber(self.db.groupDb.db, "delete")
         if number != None:
             self.db.groupDb.remove(number)
 
     def deletePerson(self):
         self.showTablePerson()
-        number = self.getNumber(self.db.personDb.db)
+        number = self.getNumber(self.db.personDb.db, "delete")
         if number != None:
             self.db.personDb.remove(number)
 

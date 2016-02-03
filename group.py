@@ -18,7 +18,7 @@ class Group(object):
             markDict = self.namedayAtr.__dict__
             for atr in range(1, len(self.order)): 
                 if markDict[self.order[atr]] == True:
-                    dictionary[self.order[atr]] = "NameD"
+                    dictionary[self.order[atr]] = "ND"
                 else:
                     dictionary[self.order[atr]] = ""
 
@@ -27,9 +27,9 @@ class Group(object):
             for atr in range(1, len(self.order)): 
                 if markDict[self.order[atr]] == True:
                     if dictionary[self.order[atr]] != "":
-                        dictionary[self.order[atr]] += " & BirthD"
+                        dictionary[self.order[atr]] += ", BD"
                     else:    
-                        dictionary[self.order[atr]] = "BirthD"
+                        dictionary[self.order[atr]] = "BD"
 
         return dictionary
 
