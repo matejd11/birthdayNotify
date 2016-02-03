@@ -35,7 +35,7 @@ class Group(object):
 
     def __str__(self):
         convert = self.convert()
-        string = ""
+        string = "\t"
         for key in self.order:
-            string+=key+": "+convert[key]+"\t"
+            string+=key+": "+convert[key]+"\n\r\t"
         return string

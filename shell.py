@@ -187,7 +187,10 @@ class Shell(object):
             except ValueError:
                 number = None
         while True and number != -1:
-            yes = input("Do you want to delete(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
+            if self.mode == 0:
+                yes = input("Do you want to delete(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
+            if self.mode == 1:
+                yes = input("Do you want to delete(" + db[number].name + ") Y/n: ")
             if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                 return number
             elif yes.lower() == 'n' or yes.lower() == 'no':
@@ -195,7 +198,10 @@ class Shell(object):
         return None
 
     def deleteGroup(self):
-        pass
+        self.showTableGroup()
+        number = self.getNumber(self.db.groupDb.db)
+        if number != None:
+            self.db.groupDb.remove(number)
 
     def deletePerson(self):
         self.showTablePerson()

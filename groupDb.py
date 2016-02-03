@@ -17,6 +17,10 @@ class GroupDb(object):
         self.isChanged = True
         self.db.append(group)
 
+    def remove(self, index):
+        self.isChanged = True
+        self.db.pop(index)
+
     def edit(self, group, newGroup):
         self.isChanged = True
         self.db.index(group)
