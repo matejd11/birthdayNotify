@@ -11,7 +11,7 @@ class Shell(object):
     def __init__(self, dbName = "database"):
         self.db = FakeDb(dbName)
         self.status = 1
-        self.mode = 0
+        self.mode = 1
         self.commands = {"help": self.helpMe,
                         "add": [self.addPerson, self.addGroup],
                         "save": self.saveDb,
@@ -140,6 +140,7 @@ class Shell(object):
                 break
             print("Choose atleast one. Atributes can't be assigned to nothing.")
         newGroup = Group(name, namedayAtr, birthdayAtr)
+        self.db.groupDb.add(newGroup)
 
     def addPerson(self):
         print("    add")
@@ -203,7 +204,8 @@ class Shell(object):
             self.db.personDb.remove(number)
 
     def showDbGroup(self):
-        pass
+        for group in self.db.groupDb.db:
+            print(group)
 
     def showDbPerson(self):
         for person in self.db.personDb.db:
@@ -213,7 +215,17 @@ class Shell(object):
         self.status = 0
 
     def showTableGroup(self):
-        pass
+        head = ["Group name",
+                "Facebook",
+                "Sms",
+                "Mail",
+                "Show"]
+        
+        content = []
+        for group in (self.db.groupDb.db):
+            content.append(group.convert())
+
+        self.showTable(head, content, Group.order)
 
     def showTablePerson(self):
         head = ["firstName",
@@ -224,17 +236,21 @@ class Shell(object):
                 "telNumber",
                 "facebook",
                 "group"]
-        self.showTable(head, self.db.personDb.db, Person.order)
+
+        content = []
+        for person in self.db.personDb.db:
+            content.append(person.__dict__)
+
+        self.showTable(head, content, Person.order)
 
     def showTable(self, head, content, order):
         largestStr = {}
         length = []
         for x in head:
             largestStr[x] = 0
-            length.append(8*(len(x)//8)+8)
+            length.append(8*((1+len(x))//8)+8)
 
-        for person in content:
-            tmp = person.__dict__
+        for tmp in content:
             for i in range(len(order)):
                 if largestStr[head[i]] < len(str(tmp[order[i]])):
                     largestStr[head[i]] = len(str(tmp[order[i]]))
@@ -242,7 +258,7 @@ class Shell(object):
         tabSize = []
         headStr = " ID\t"
         for i in range(len(head)-1):
-            tabSize.append(ceil((largestStr[head[i]]-length[i])/8))
+            tabSize.append(ceil((largestStr[head[i]]+1-length[i])/8))
             if tabSize[i] < 0:
                 tabSize[i] = 0
             headStr += "|"+head[i]+ "\t"*tabSize[i] + "\t"
@@ -251,10 +267,9 @@ class Shell(object):
 
         print(" "+"-"*8*17)
 
-        for count, person in enumerate(content):
-            tmp = person.__dict__
+        for count, tmp in enumerate(content):
             raw =" ["+str(count)+"]\t|"
             for i in range(len(order)-1):
-                raw += str(tmp[order[i]])+"\t"*ceil(((length[i]+ tabSize[i]*8)-len(str(tmp[order[i]])))/8)+"|"
+                raw += str(tmp[order[i]])+"\t"*ceil(((length[i]+ tabSize[i]*8)-1-len(str(tmp[order[i]])))/8)+"|"
             raw += str(tmp[order[-1]])
-            print (raw)
+            print(raw)
