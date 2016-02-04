@@ -24,11 +24,13 @@ class Shell(object):
                         "edit": [self.editPerson, self.editGroup, self.editEvent],
                         "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent],
                         "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent],
-                        "mode": self.changeMode,
+                        "Person": self.changeToPerson,
+                        "Group": self.changeToGroup,
+                        "Event": self.changeToEvent,
                         "del": [self.deletePerson, self.deleteGroup, self.deleteEvent]}
 
         self.commandsHelp = ["help\t: show help for commands",
-                            "mode\t: switch bettween modes",
+                            "Event, Group, Person\t: switch bettween modes",
                             "\tadd\t: add mode in database",
                             "\tdel\t: delete mode from database",
                             "\tdel\t: edit mode in database",
@@ -91,17 +93,16 @@ class Shell(object):
         print("    help:")
         for command in self.commandsHelp:
             print("\t", command)
+    
+    def changeToPerson(self):
+        self.mode = 0
 
-    def changeMode(self):
-        while True:
-            try:
-                self.mode = int(input("\tChange mode to 0 = Person or 1 = Group or 2 = Event: "))
-                if self.mode == 0 or self.mode == 1 or self.mode == 2:
-                    print("\tMode has been changed to ", self.modeName())
-                    break
-            except ValueError:
-                pass
+    def changeToGroup(self):
+        self.mode = 1
 
+    def changeToEvent(self):
+        self.mode = 2
+        
     def checkBox(self, text):
         while True:
             check = input(text)
