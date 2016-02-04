@@ -8,8 +8,10 @@ import numpy as np
 import readline
 import re
 
+
 class Shell(object):
-    def __init__(self, dbName = "database"):
+
+    def __init__(self, dbName="database"):
         self.db = FakeDb(dbName)
         self.status = 1
         self.mode = 0
@@ -130,10 +132,10 @@ class Shell(object):
         shortcut = input("\teventShortcut: ")
         newEvent = Event(name, shortcut)
         self.db.eventDb.add(newEvent)
+        for person in self.db.personDb.db:
+            person.date[newEvent.name] = ""
 
     def addGroup(self):
-        nameday = Event("nameday", "ND")
-        birthday = Event("birthday", "BD")
         name = input("    groupName: ")
         print("\t#use 1: yes 0: no")
         print("\tAssign atributes to")
@@ -158,21 +160,18 @@ class Shell(object):
 
         firstName = input("\tfirstName: ")
         secondName = input("\tsecondName: ")
-        while True:
-            try:
-                birthdayDate = (np.datetime64(input("\tbirthdayDate YYYY-MM-DD: ")))
-                if str(birthdayDate) != "NaT":
-                    break
-            except ValueError:
-                pass
-                
-        while True:
-            try:
-                namedayDate = (np.datetime64(input("\tnamedayDate: ")))
-                if str(namedayDate) != "NaT":
-                    break
-            except ValueError:
-                pass
+
+        dates = {}
+        for event in self.db.eventDb.db:
+            while True:
+                try:
+                    date = input("\t"+event.name+" YYYY-MM-DD: ")
+                    if str(date) == "NaT":
+                        date = ""
+                    break    
+                except ValueError:
+                    pass
+            dates[event.name] = date
 
         while True:
             mail = input("\tmail: ")
@@ -186,7 +185,7 @@ class Shell(object):
 
         facebook = input("\tfacebook: ")
 
-        newPerson = Person(firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook)
+        newPerson = Person(firstName, secondName, dates, mail, telNumber, facebook)
 
         self.db.personDb.add(newPerson)
 
@@ -200,7 +199,7 @@ class Shell(object):
         while True and number != -1:
             if self.mode == 0:
                 yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
-            if self.mode == 1:
+            if self.mode == 1 or self.mode == 2:
                 yes = input("Do you want to "+reason+"(" + db[number].name + ") Y/n: ")
             if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                 return number
@@ -226,7 +225,10 @@ class Shell(object):
             self.db.personDb.remove(number)
     
     def deleteEvent(self):
-        pass
+        self.showTableEvent()
+        number = self.getNumber(self.db.eventDb.db, "delete")
+        if number != None:
+            self.db.eventDb.remove(number)
 
     def deleteGroup(self):
         self.showTableGroup()
@@ -248,6 +250,7 @@ class Shell(object):
             print(group)
 
     def showDbPerson(self):
+        eventDb = self.db.eventDb.db
         for person in self.db.personDb.db:
             print(person)
 
@@ -280,18 +283,21 @@ class Shell(object):
     def showTablePerson(self):
         head = ["firstName",
                 "secondName",
-                "birthdayDate",
-                "namedayDate",
                 "mail",
                 "telNumber",
-                "facebook",
-                "group"]
+                "facebook"]
+        order = Person.order
+        for event in self.db.eventDb.db:
+            order.append(event.name)
+            head.append(event.name)
+        order.append("group")
+        head.append("group")
 
         content = []
         for person in self.db.personDb.db:
-            content.append(person.__dict__)
+            content.append(person.convert())
 
-        self.showTable(head, content, Person.order)
+        self.showTable(head, content, order)
 
     def showTable(self, head, content, order):
         largestStr = {}

@@ -1,11 +1,10 @@
-from event import Event
-
 class Group(object):
     order = ["name",
              "facebook",
              "sms",
              "mail",
              "show"]
+
     def __init__(self, name, eventsAtr):
         self.name = name
         self.eventsAtr = eventsAtr
@@ -17,10 +16,11 @@ class Group(object):
         for eventAtr in self.eventsAtr:
             markDict = eventAtr.__dict__
             for atr in range(1, len(self.order)):
-                dictionary[self.order[atr]] = ""
-                if markDict[self.order[atr]] == True:
+                if self.order[atr] not in dictionary:
+                    dictionary[self.order[atr]] = ""
+                if markDict[self.order[atr]] is True:
                     if dictionary[self.order[atr]] != "":
-                        dictionary[self.order[atr]] += ", "+eventAtr.event.shortcut    
+                        dictionary[self.order[atr]] += ", "+eventAtr.event.shortcut
                     else:
                         dictionary[self.order[atr]] = eventAtr.event.shortcut
         return dictionary
@@ -29,5 +29,5 @@ class Group(object):
         convert = self.convert()
         string = "\t"
         for key in self.order:
-            string+=key+": "+convert[key]+"\n\r\t"
+            string += key+": "+convert[key]+"\n\r\t"
         return string
