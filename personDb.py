@@ -21,9 +21,8 @@ class PersonDb(object):
         self.isChanged = True
         self.db.pop(index)
 
-    def edit(self, person, newPerson):
+    def edit(self, index, newPerson):
         self.isChanged = True
-        self.db.index(person)
         self.db[index] = newPerson
 
     def save(self, fileName = None):

@@ -87,7 +87,6 @@ class Shell(object):
     def loadDb(self):
         name = self.getDbName()
         self.db.load(name)
-        #self.db = FakeDb(name)
 
     def helpMe(self):
         print("    help:")
@@ -128,15 +127,28 @@ class Shell(object):
             print("Choose atleast one atribute.")
         return Atribute(event, facebook, sms, mail, show)
 
-    def addEvent(self):
+    def addEvent(self, edit = "False"):
         name = input("\teventName: ")
         shortcut = input("\teventShortcut: ")
         newEvent = Event(name, shortcut)
-        self.db.eventDb.add(newEvent)
-        for person in self.db.personDb.db:
-            person.date[newEvent.name] = ""
+        if edit == "False":
+            self.db.eventDb.add(newEvent)
+            for person in self.db.personDb.db:
+                person.date[newEvent.name] = ""
+        else:
+            for person in self.db.personDb.db:
+                tmp = person.__dict__
+                change = tmp["date"][self.db.eventDb.db[edit].name]
+                del tmp["date"][self.db.eventDb.db[edit].name]
+                tmp["date"][newEvent.name] = change
+            for group in self.db.groupDb.db:
+                for atr in group.eventsAtr:
+                    if atr.event.name == self.db.eventDb.db[edit].name:
+                        atr.event = newEvent
+            self.db.eventDb.edit(edit, newEvent)
+                
 
-    def addGroup(self):
+    def addGroup(self, edit = "False"):
         name = input("    groupName: ")
         print("\t#use 1: yes 0: no")
         print("\tAssign atributes to")
@@ -154,9 +166,12 @@ class Shell(object):
             print("Choose atleast one. Atributes can't be assigned to nothing.")
 
         newGroup = Group(name, eventsAtr)
-        self.db.groupDb.add(newGroup)
+        if edit == "False":
+            self.db.groupDb.add(newGroup)
+        else:
+            self.db.groupDb.edit(edit, newGroup)
 
-    def addPerson(self):
+    def addPerson(self, edit = "False"):
         print("    add")
 
         firstName = input("\tfirstName: ")
@@ -188,7 +203,10 @@ class Shell(object):
 
         newPerson = Person(firstName, secondName, dates, mail, telNumber, facebook)
 
-        self.db.personDb.add(newPerson)
+        if edit == "False":
+            self.db.personDb.add(newPerson)
+        else:
+            self.db.personDb.edit(edit, newPerson)
 
     def getNumber(self, db, reason):
         number = None
@@ -209,21 +227,22 @@ class Shell(object):
         return None
     
     def editEvent(self):
-        pass
+        self.showTableEvent()
+        number = self.getNumber(self.db.eventDb.db, "edit")
+        if number != None:
+            self.addEvent(number)
 
     def editGroup(self):
         self.showTableGroup()
         number = self.getNumber(self.db.groupDb.db, "edit")
         if number != None:
-            self.addGroup()
-            self.db.groupDb.remove(number)
+            self.addGroup(number)
 
     def editPerson(self):
         self.showTablePerson()
         number = self.getNumber(self.db.personDb.db, "edit")
         if number != None:
-            self.addPerson()
-            self.db.personDb.remove(number)
+            self.addPerson(number)
     
     def deleteEvent(self):
         self.showTableEvent()
@@ -244,14 +263,14 @@ class Shell(object):
             self.db.personDb.remove(number)
 
     def showDbEvent(self):
-        pass
+        for event in self.db.eventDb.db:
+            print(event)
 
     def showDbGroup(self):
         for group in self.db.groupDb.db:
             print(group)
 
     def showDbPerson(self):
-        eventDb = self.db.eventDb.db
         for person in self.db.personDb.db:
             print(person)
 
@@ -287,7 +306,7 @@ class Shell(object):
                 "mail",
                 "telNumber",
                 "facebook"]
-        order = Person.order
+        order = Person.order[:]
         for event in self.db.eventDb.db:
             order.append(event.name)
             head.append(event.name)

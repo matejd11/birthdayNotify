@@ -21,9 +21,8 @@ class GroupDb(object):
         self.isChanged = True
         self.db.pop(index)
 
-    def edit(self, group, newGroup):
+    def edit(self, index, newGroup):
         self.isChanged = True
-        self.db.index(group)
         self.db[index] = newGroup
 
     def save(self, fileName = None):

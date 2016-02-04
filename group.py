@@ -1,3 +1,6 @@
+import json
+
+
 class Group(object):
     order = ["name",
              "facebook",
@@ -26,8 +29,5 @@ class Group(object):
         return dictionary
 
     def __str__(self):
-        convert = self.convert()
-        string = "\t"
-        for key in self.order:
-            string += key+": "+convert[key]+"\n\r\t"
-        return string
+        me = self.convert()
+        return str(json.dumps(me, sort_keys = True, indent = 4))

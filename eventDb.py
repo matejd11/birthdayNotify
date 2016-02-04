@@ -21,9 +21,8 @@ class EventDb(object):
         self.isChanged = True
         self.db.pop(index)
 
-    def edit(self, event, newEvent):
+    def edit(self, index, newEvent):
         self.isChanged = True
-        self.db.index(event)
         self.db[index] = newEvent
 
     def save(self, fileName = None):
