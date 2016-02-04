@@ -300,24 +300,22 @@ class Shell(object):
         self.showTable(head, content, order)
 
     def showTable(self, head, content, order):
+        spaceExtra = 2
         largestStr = {}
         length = []
         for x in head:
-            largestStr[x] = 0
-            length.append(8*((1+len(x))//8)+8)
+            largestStr[x] = len(x)
+            length.append(1+len(x))
 
         for tmp in content:
             for i in range(len(order)):
                 if largestStr[head[i]] < len(str(tmp[order[i]])):
                     largestStr[head[i]] = len(str(tmp[order[i]]))
 
-        tabSize = []
         headStr = " ID\t"
         for i in range(len(head)-1):
-            tabSize.append(ceil((largestStr[head[i]]+1-length[i])/8))
-            if tabSize[i] < 0:
-                tabSize[i] = 0
-            headStr += "|"+head[i]+ "\t"*tabSize[i] + "\t"
+            tabSize = (largestStr[head[i]]+1+spaceExtra-length[i])
+            headStr += "|"+head[i]+(" "*tabSize)
         headStr += "|"+head[-1]
         print(headStr)
 
@@ -326,6 +324,6 @@ class Shell(object):
         for count, tmp in enumerate(content):
             raw =" ["+str(count)+"]\t|"
             for i in range(len(order)-1):
-                raw += str(tmp[order[i]])+"\t"*ceil(((length[i]+ tabSize[i]*8)-1-len(str(tmp[order[i]])))/8)+"|"
+                raw += str(tmp[order[i]])+" "*(largestStr[head[i]]+spaceExtra-len(str(tmp[order[i]])))+"|"
             raw += str(tmp[order[-1]])
             print(raw)
