@@ -17,15 +17,15 @@ class Group(object):
         dictionary["name"] = self.name
 
         for eventAtr in self.eventsAtr:
-            markDict = eventAtr.__dict__
+            markDict = self.eventsAtr[eventAtr].__dict__
             for atr in range(1, len(self.order)):
                 if self.order[atr] not in dictionary:
                     dictionary[self.order[atr]] = ""
                 if markDict[self.order[atr]] is True:
                     if dictionary[self.order[atr]] != "":
-                        dictionary[self.order[atr]] += ", "+eventAtr.event.shortcut
+                        dictionary[self.order[atr]] += ", "+self.eventsAtr[eventAtr].event.shortcut
                     else:
-                        dictionary[self.order[atr]] = eventAtr.event.shortcut
+                        dictionary[self.order[atr]] = self.eventsAtr[eventAtr].event.shortcut
         return dictionary
 
     def __str__(self):

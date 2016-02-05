@@ -115,73 +115,101 @@ class Shell(object):
                 if check == "":
                     return False
             
-    def addAtributes(self, event):
+    def addAtributes(self, event, edit = False):
         print("\t\tAtributes for "+event.name)
         while True:
-            facebook = self.checkBox("\t\t  send by Facebook: ")
-            sms = self.checkBox("\t\t  send by sms: ")
-            mail = self.checkBox("\t\t  send by e-mail: ")
-            show = self.checkBox("\t\t  show message: ")
+            if edit is False:
+                facebook = self.checkBox("\t\t  send by Facebook: ")
+                sms = self.checkBox("\t\t  send by sms: ")
+                mail = self.checkBox("\t\t  send by e-mail: ")
+                show = self.checkBox("\t\t  show message: ")
+            else:
+                oldAtr = self.db.groupDb.db[edit].eventsAtr[event.name]
+                facebook = self.checkBox("\t\t  send by Facebook("+str(oldAtr.facebook)+"): ")
+                sms = self.checkBox("\t\t  send by sms("+str(oldAtr.sms)+"): ")
+                mail = self.checkBox("\t\t  send by e-mail("+str(oldAtr.mail)+"): ")
+                show = self.checkBox("\t\t  show message("+str(oldAtr.show)+"): ")
+
             if facebook == True or sms == True or mail == True or show == True:
                 break
             print("Choose atleast one atribute.")
         return Atribute(event, facebook, sms, mail, show)
 
-    def addEvent(self, edit = "False"):
-        name = input("\teventName: ")
-        shortcut = input("\teventShortcut: ")
+    def addEvent(self, edit = False):
+        if edit is False:
+            name = input("\teventName: ")
+            shortcut = input("\teventShortcut: ")
+        else:
+            oldEvent = self.db.eventDb.db[edit]
+            name = input("\teventName("+oldEvent.name+"): ")
+            shortcut = input("\teventShortcut("+oldEvent.shortcut+"): ")
+
         newEvent = Event(name, shortcut)
-        if edit == "False":
+
+        if edit is False:
             self.db.eventDb.add(newEvent)
             for person in self.db.personDb.db:
                 person.date[newEvent.name] = ""
         else:
             for person in self.db.personDb.db:
                 tmp = person.__dict__
-                change = tmp["date"][self.db.eventDb.db[edit].name]
-                del tmp["date"][self.db.eventDb.db[edit].name]
+                change = tmp["date"][oldEvent.name]
+                del tmp["date"][oldEvent.name]
                 tmp["date"][newEvent.name] = change
+
             for group in self.db.groupDb.db:
                 for atr in group.eventsAtr:
-                    if atr.event.name == self.db.eventDb.db[edit].name:
-                        atr.event = newEvent
-            self.db.eventDb.edit(edit, newEvent)
-                
+                    if group.eventsAtr[atr].event.name == oldEvent.name:
+                        group.eventsAtr[atr].event = newEvent
 
-    def addGroup(self, edit = "False"):
-        name = input("    groupName: ")
+            self.db.eventDb.edit(edit, newEvent)
+
+    def addGroup(self, edit = False):
+        if edit is False:
+            name = input("    groupName: ")
+        else:    
+            name = input("    groupName("+self.db.groupDb.db[edit].name+"): ")
+
         print("\t#use 1: yes 0: no")
         print("\tAssign atributes to")
-        eventsAtr = []
+        eventsAtr = {}
         while True:
             check =False
             for event in self.db.eventDb.db:
                 check = self.checkBox("\t  "+event.name+": ")
                 if check == True:
-                    eventAtr = self.addAtributes(event)
-                    eventsAtr.append(eventAtr)
+                    eventAtr = self.addAtributes(event, edit)
+                    eventsAtr[event.name] = eventAtr
+                    atleastOne = True
 
-            if check == True:
+            if atleastOne == True:
                 break
             print("Choose atleast one. Atributes can't be assigned to nothing.")
 
         newGroup = Group(name, eventsAtr)
-        if edit == "False":
+        if edit is False:
             self.db.groupDb.add(newGroup)
         else:
             self.db.groupDb.edit(edit, newGroup)
 
-    def addPerson(self, edit = "False"):
+    def addPerson(self, edit = False):
         print("    add")
-
-        firstName = input("\tfirstName: ")
-        secondName = input("\tsecondName: ")
+        if edit is False:
+            firstName = input("\tfirstName: ")
+            secondName = input("\tsecondName: ")
+        else:
+            oldPerson = self.db.personDb.db[edit]
+            firstName = input("\tfirstName("+oldPerson.firstName+"): ")
+            secondName = input("\tsecondName("+oldPerson.secondName+"): ")
 
         dates = {}
         for event in self.db.eventDb.db:
             while True:
                 try:
-                    date = input("\t"+event.name+" YYYY-MM-DD: ")
+                    if edit is False:
+                        date = input("\t"+event.name+" YYYY-MM-DD: ")
+                    else:
+                        date = input("\t"+event.name+" YYYY-MM-DD("+str(oldPerson.date[event.name])+"): ")
                     if str(date) == "NaT":
                         date = ""
                     break    
@@ -190,20 +218,29 @@ class Shell(object):
             dates[event.name] = date
 
         while True:
-            mail = input("\tmail: ")
+            if edit is False:
+                mail = input("\tmail: ")
+            else:
+                mail = input("\tmail("+oldPerson.mail+"): ")
             if re.search(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$", mail) != None:
                 break
 
         while True:
-            telNumber = input("\ttelNumber: ")
+            if edit is False:
+                telNumber = input("\ttelNumber: ")
+            else:
+                telNumber = input("\ttelNumber("+str(oldPerson.telNumber)+"): ")
             if re.search(r"^((\+\d{3}\ )|\d)?\d{3}\ ?\d{3}\ ?\d{3}$",telNumber) != None:
                 break
 
-        facebook = input("\tfacebook: ")
+        if edit is False:
+            facebook = input("\tfacebook: ")
+        else:
+            facebook = input("\tfacebook("+oldPerson.facebook+"): ")
 
         newPerson = Person(firstName, secondName, dates, mail, telNumber, facebook)
 
-        if edit == "False":
+        if edit is False:
             self.db.personDb.add(newPerson)
         else:
             self.db.personDb.edit(edit, newPerson)
