@@ -1,6 +1,7 @@
 import os
 from personDb import PersonDb
 from groupDb import GroupDb
+from eventDb import EventDb
 
 
 class FakeDb(object):
@@ -9,6 +10,7 @@ class FakeDb(object):
         self.setDbNames(dbName)
         self.personDb = PersonDb(self.personDbName, autoload)
         self.groupDb = GroupDb(self.groupDbName, autoload)
+        self.eventDb = EventDb(self.eventDbName, autoload)
         if autoload:
             self.setup()
 
@@ -22,6 +24,7 @@ class FakeDb(object):
 #change to _save
         self.personDb.save(self.personDbName)
         self.groupDb.save(self.groupDbName)
+        self.eventDb.save(self.eventDbName)
 
     def load(self, fileName = None):
         if fileName == None:
@@ -30,10 +33,12 @@ class FakeDb(object):
 #change to _save
         self.personDb.load(self.personDbName)
         self.groupDb.load(self.groupDbName)
+        self.eventDb.load(self.eventDbName)
 
     def setDbNames(self, dbName):
         self.personDbName = FakeDb.fileExtension(dbName + ".p")
         self.groupDbName = FakeDb.fileExtension(dbName + ".g")
+        self.eventDbName = FakeDb.fileExtension(dbName + ".e")
 
     def fileExtension(fileName):
         result = fileName.strip()

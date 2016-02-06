@@ -2,7 +2,7 @@ import pickle
 import os
 
 
-class GroupDb(object):
+class EventDb(object):
     def __init__(self, dbName, autoload = False):
         self.dbName = dbName
         self.db = None
@@ -13,17 +13,17 @@ class GroupDb(object):
     def setup(self):
         self.db = self.load(self.dbName)
 
-    def add(self, group):
+    def add(self, event):
         self.isChanged = True
-        self.db.append(group)
+        self.db.append(event)
 
     def remove(self, index):
         self.isChanged = True
         self.db.pop(index)
 
-    def edit(self, index, newGroup):
+    def edit(self, index, newEvent):
         self.isChanged = True
-        self.db[index] = newGroup
+        self.db[index] = newEvent
 
     def save(self, fileName = None):
         if fileName == None:

@@ -1,31 +1,36 @@
 from person import Person
 from group import Group
 from atributes import Atribute
+from event import Event
 from fakeDb import FakeDb
 from math import ceil
 import numpy as np
 import readline
 import re
 
+
 class Shell(object):
-    def __init__(self, dbName = "database"):
+
+    def __init__(self, dbName="database"):
         self.db = FakeDb(dbName)
         self.status = 1
         self.mode = 0
         self.commands = {"help": self.helpMe,
-                        "add": [self.addPerson, self.addGroup],
+                        "add": [self.addPerson, self.addGroup, self.addEvent],
                         "save": self.saveDb,
                         "load": self.loadDb,
                         "quit": self.quit,
                         "exit": self.quit,
-                        "edit": [self.editPerson, self.editGroup],
-                        "list": [self.showDbPerson, self.showDbGroup],
-                        "table": [self.showTablePerson, self.showTableGroup],
-                        "mode": self.changeMode,
-                        "del": [self.deletePerson, self.deleteGroup]}
+                        "edit": [self.editPerson, self.editGroup, self.editEvent],
+                        "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent],
+                        "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent],
+                        "Person": self.changeToPerson,
+                        "Group": self.changeToGroup,
+                        "Event": self.changeToEvent,
+                        "del": [self.deletePerson, self.deleteGroup, self.deleteEvent]}
 
         self.commandsHelp = ["help\t: show help for commands",
-                            "mode 0/1\t: 0 for person 1 for group",
+                            "Event, Group, Person\t: switch bettween modes",
                             "\tadd\t: add mode in database",
                             "\tdel\t: delete mode from database",
                             "\tdel\t: edit mode in database",
@@ -66,6 +71,8 @@ class Shell(object):
             return "Person"
         if self.mode == 1:
             return "Group"
+        if self.mode == 2:
+            return "Event"
 
     def getDbName(self):
         name = input("\tEnter name of DB(leave blank for `" + self.db.dbName + "`): ")
@@ -80,23 +87,21 @@ class Shell(object):
     def loadDb(self):
         name = self.getDbName()
         self.db.load(name)
-        #self.db = FakeDb(name)
 
     def helpMe(self):
         print("    help:")
         for command in self.commandsHelp:
             print("\t", command)
+    
+    def changeToPerson(self):
+        self.mode = 0
 
-    def changeMode(self):
-        while True:
-            try:
-                self.mode = int(input("\tChange mode to 0 = Person or 1 = Group: "))
-                if self.mode == 0 or self.mode == 1:
-                    print("\tMode has been changed to ", self.modeName())
-                    break
-            except ValueError:
-                pass
+    def changeToGroup(self):
+        self.mode = 1
 
+    def changeToEvent(self):
+        self.mode = 2
+        
     def checkBox(self, text):
         while True:
             check = input(text)
@@ -110,76 +115,135 @@ class Shell(object):
                 if check == "":
                     return False
             
-    def addAtributes(self, name):
-        print("\t\tAtributes for "+name)
+    def addAtributes(self, event, edit = False):
+        print("\t\tAtributes for "+event.name)
         while True:
-            facebook = self.checkBox("\t\t  send by Facebook: ")
-            sms = self.checkBox("\t\t  send by sms: ")
-            mail = self.checkBox("\t\t  send by e-mail: ")
-            show = self.checkBox("\t\t  show message: ")
+            if edit is False:
+                facebook = self.checkBox("\t\t  send by Facebook: ")
+                sms = self.checkBox("\t\t  send by sms: ")
+                mail = self.checkBox("\t\t  send by e-mail: ")
+                show = self.checkBox("\t\t  show message: ")
+            else:
+                oldAtr = self.db.groupDb.db[edit].eventsAtr[event.name]
+                facebook = self.checkBox("\t\t  send by Facebook("+str(oldAtr.facebook)+"): ")
+                sms = self.checkBox("\t\t  send by sms("+str(oldAtr.sms)+"): ")
+                mail = self.checkBox("\t\t  send by e-mail("+str(oldAtr.mail)+"): ")
+                show = self.checkBox("\t\t  show message("+str(oldAtr.show)+"): ")
+
             if facebook == True or sms == True or mail == True or show == True:
                 break
             print("Choose atleast one atribute.")
-        return Atribute(name, facebook, sms, mail, show)
+        return Atribute(event, facebook, sms, mail, show)
 
-    def addGroup(self):
-        print("    add")
-        name = input("    groupName: ")
+    def addEvent(self, edit = False):
+        if edit is False:
+            name = input("\teventName: ")
+            shortcut = input("\teventShortcut: ")
+        else:
+            oldEvent = self.db.eventDb.db[edit]
+            name = input("\teventName("+oldEvent.name+"): ")
+            shortcut = input("\teventShortcut("+oldEvent.shortcut+"): ")
+
+        newEvent = Event(name, shortcut)
+
+        if edit is False:
+            self.db.eventDb.add(newEvent)
+            for person in self.db.personDb.db:
+                person.date[newEvent.name] = ""
+        else:
+            for person in self.db.personDb.db:
+                tmp = person.__dict__
+                change = tmp["date"][oldEvent.name]
+                del tmp["date"][oldEvent.name]
+                tmp["date"][newEvent.name] = change
+
+            for group in self.db.groupDb.db:
+                for atr in group.eventsAtr:
+                    if group.eventsAtr[atr].event.name == oldEvent.name:
+                        group.eventsAtr[atr].event = newEvent
+
+            self.db.eventDb.edit(edit, newEvent)
+
+    def addGroup(self, edit = False):
+        if edit is False:
+            name = input("    groupName: ")
+        else:    
+            name = input("    groupName("+self.db.groupDb.db[edit].name+"): ")
+
         print("\t#use 1: yes 0: no")
         print("\tAssign atributes to")
+        eventsAtr = {}
         while True:
-            namedayAtr = False
-            birthdayAtr = False
+            check =False
+            for event in self.db.eventDb.db:
+                check = self.checkBox("\t  "+event.name+": ")
+                if check == True:
+                    eventAtr = self.addAtributes(event, edit)
+                    eventsAtr[event.name] = eventAtr
+                    atleastOne = True
 
-            namedayDate = self.checkBox("\t  namedayDate: ")
-            if namedayDate == True:
-                namedayAtr = self.addAtributes(name+"Nameday")
-            birthdayDate = self.checkBox("\t  birthdayDate: ")
-            if birthdayDate == True:
-                birthdayAtr = self.addAtributes(name+"Birthday")
-
-            if birthdayDate == True or namedayDate == True:
+            if atleastOne == True:
                 break
             print("Choose atleast one. Atributes can't be assigned to nothing.")
-        newGroup = Group(name, namedayAtr, birthdayAtr)
-        self.db.groupDb.add(newGroup)
 
-    def addPerson(self):
+        newGroup = Group(name, eventsAtr)
+        if edit is False:
+            self.db.groupDb.add(newGroup)
+        else:
+            self.db.groupDb.edit(edit, newGroup)
+
+    def addPerson(self, edit = False):
         print("    add")
+        if edit is False:
+            firstName = input("\tfirstName: ")
+            secondName = input("\tsecondName: ")
+        else:
+            oldPerson = self.db.personDb.db[edit]
+            firstName = input("\tfirstName("+oldPerson.firstName+"): ")
+            secondName = input("\tsecondName("+oldPerson.secondName+"): ")
 
-        firstName = input("\tfirstName: ")
-        secondName = input("\tsecondName: ")
-        while True:
-            try:
-                birthdayDate = (np.datetime64(input("\tbirthdayDate YYYY-MM-DD: ")))
-                if str(birthdayDate) != "NaT":
-                    break
-            except ValueError:
-                pass
-                
-        while True:
-            try:
-                namedayDate = (np.datetime64(input("\tnamedayDate: ")))
-                if str(namedayDate) != "NaT":
-                    break
-            except ValueError:
-                pass
+        dates = {}
+        for event in self.db.eventDb.db:
+            while True:
+                try:
+                    if edit is False:
+                        date = input("\t"+event.name+" YYYY-MM-DD: ")
+                    else:
+                        date = input("\t"+event.name+" YYYY-MM-DD("+str(oldPerson.date[event.name])+"): ")
+                    if str(date) == "NaT":
+                        date = ""
+                    break    
+                except ValueError:
+                    pass
+            dates[event.name] = date
 
         while True:
-            mail = input("\tmail: ")
+            if edit is False:
+                mail = input("\tmail: ")
+            else:
+                mail = input("\tmail("+oldPerson.mail+"): ")
             if re.search(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$", mail) != None:
                 break
 
         while True:
-            telNumber = input("\ttelNumber: ")
+            if edit is False:
+                telNumber = input("\ttelNumber: ")
+            else:
+                telNumber = input("\ttelNumber("+str(oldPerson.telNumber)+"): ")
             if re.search(r"^((\+\d{3}\ )|\d)?\d{3}\ ?\d{3}\ ?\d{3}$",telNumber) != None:
                 break
 
-        facebook = input("\tfacebook: ")
+        if edit is False:
+            facebook = input("\tfacebook: ")
+        else:
+            facebook = input("\tfacebook("+oldPerson.facebook+"): ")
 
-        newPerson = Person(firstName, secondName, birthdayDate, namedayDate, mail, telNumber, facebook)
+        newPerson = Person(firstName, secondName, dates, mail, telNumber, facebook)
 
-        self.db.personDb.add(newPerson)
+        if edit is False:
+            self.db.personDb.add(newPerson)
+        else:
+            self.db.personDb.edit(edit, newPerson)
 
     def getNumber(self, db, reason):
         number = None
@@ -191,27 +255,37 @@ class Shell(object):
         while True and number != -1:
             if self.mode == 0:
                 yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
-            if self.mode == 1:
+            if self.mode == 1 or self.mode == 2:
                 yes = input("Do you want to "+reason+"(" + db[number].name + ") Y/n: ")
             if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                 return number
             elif yes.lower() == 'n' or yes.lower() == 'no':
                 break
         return None
+    
+    def editEvent(self):
+        self.showTableEvent()
+        number = self.getNumber(self.db.eventDb.db, "edit")
+        if number != None:
+            self.addEvent(number)
 
     def editGroup(self):
         self.showTableGroup()
         number = self.getNumber(self.db.groupDb.db, "edit")
         if number != None:
-            self.addGroup()
-            self.db.groupDb.remove(number)
+            self.addGroup(number)
 
     def editPerson(self):
         self.showTablePerson()
         number = self.getNumber(self.db.personDb.db, "edit")
         if number != None:
-            self.addPerson()
-            self.db.personDb.remove(number)
+            self.addPerson(number)
+    
+    def deleteEvent(self):
+        self.showTableEvent()
+        number = self.getNumber(self.db.eventDb.db, "delete")
+        if number != None:
+            self.db.eventDb.remove(number)
 
     def deleteGroup(self):
         self.showTableGroup()
@@ -225,6 +299,10 @@ class Shell(object):
         if number != None:
             self.db.personDb.remove(number)
 
+    def showDbEvent(self):
+        for event in self.db.eventDb.db:
+            print(event)
+
     def showDbGroup(self):
         for group in self.db.groupDb.db:
             print(group)
@@ -235,6 +313,16 @@ class Shell(object):
 
     def quit(self):
         self.status = 0
+
+    def showTableEvent(self):
+        head = ["Event name",
+                "Shortcut",]
+        
+        content = []
+        for event in self.db.eventDb.db:
+            content.append(event.__dict__)
+
+        self.showTable(head, content, Event.order)
 
     def showTableGroup(self):
         head = ["Group name",
@@ -252,38 +340,39 @@ class Shell(object):
     def showTablePerson(self):
         head = ["firstName",
                 "secondName",
-                "birthdayDate",
-                "namedayDate",
                 "mail",
                 "telNumber",
-                "facebook",
-                "group"]
+                "facebook"]
+        order = Person.order[:]
+        for event in self.db.eventDb.db:
+            order.append(event.name)
+            head.append(event.name)
+        order.append("group")
+        head.append("group")
 
         content = []
         for person in self.db.personDb.db:
-            content.append(person.__dict__)
+            content.append(person.convert())
 
-        self.showTable(head, content, Person.order)
+        self.showTable(head, content, order)
 
     def showTable(self, head, content, order):
+        spaceExtra = 2
         largestStr = {}
         length = []
         for x in head:
-            largestStr[x] = 0
-            length.append(8*((1+len(x))//8)+8)
+            largestStr[x] = len(x)
+            length.append(1+len(x))
 
         for tmp in content:
             for i in range(len(order)):
                 if largestStr[head[i]] < len(str(tmp[order[i]])):
                     largestStr[head[i]] = len(str(tmp[order[i]]))
 
-        tabSize = []
         headStr = " ID\t"
         for i in range(len(head)-1):
-            tabSize.append(ceil((largestStr[head[i]]+1-length[i])/8))
-            if tabSize[i] < 0:
-                tabSize[i] = 0
-            headStr += "|"+head[i]+ "\t"*tabSize[i] + "\t"
+            tabSize = (largestStr[head[i]]+1+spaceExtra-length[i])
+            headStr += "|"+head[i]+(" "*tabSize)
         headStr += "|"+head[-1]
         print(headStr)
 
@@ -292,6 +381,6 @@ class Shell(object):
         for count, tmp in enumerate(content):
             raw =" ["+str(count)+"]\t|"
             for i in range(len(order)-1):
-                raw += str(tmp[order[i]])+"\t"*ceil(((length[i]+ tabSize[i]*8)-1-len(str(tmp[order[i]])))/8)+"|"
+                raw += str(tmp[order[i]])+" "*(largestStr[head[i]]+spaceExtra-len(str(tmp[order[i]])))+"|"
             raw += str(tmp[order[-1]])
             print(raw)

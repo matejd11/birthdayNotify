@@ -1,3 +1,5 @@
+import json
+
 
 class Group(object):
     order = ["name",
@@ -5,37 +7,27 @@ class Group(object):
              "sms",
              "mail",
              "show"]
-    def __init__(self, name, namedayAtr, birthdayAtr):
+
+    def __init__(self, name, eventsAtr):
         self.name = name
-        self.namedayAtr = namedayAtr
-        self.birthdayAtr = birthdayAtr
+        self.eventsAtr = eventsAtr
 
     def convert(self):
         dictionary = {}
         dictionary["name"] = self.name
 
-        if self.namedayAtr != False:
-            markDict = self.namedayAtr.__dict__
-            for atr in range(1, len(self.order)): 
-                if markDict[self.order[atr]] == True:
-                    dictionary[self.order[atr]] = "ND"
-                else:
+        for eventAtr in self.eventsAtr:
+            markDict = self.eventsAtr[eventAtr].__dict__
+            for atr in range(1, len(self.order)):
+                if self.order[atr] not in dictionary:
                     dictionary[self.order[atr]] = ""
-
-        if self.birthdayAtr != False:
-            markDict = self.birthdayAtr.__dict__
-            for atr in range(1, len(self.order)): 
-                if markDict[self.order[atr]] == True:
+                if markDict[self.order[atr]] is True:
                     if dictionary[self.order[atr]] != "":
-                        dictionary[self.order[atr]] += ", BD"
-                    else:    
-                        dictionary[self.order[atr]] = "BD"
-
+                        dictionary[self.order[atr]] += ", "+self.eventsAtr[eventAtr].event.shortcut
+                    else:
+                        dictionary[self.order[atr]] = self.eventsAtr[eventAtr].event.shortcut
         return dictionary
 
     def __str__(self):
-        convert = self.convert()
-        string = "\t"
-        for key in self.order:
-            string+=key+": "+convert[key]+"\n\r\t"
-        return string
+        me = self.convert()
+        return str(json.dumps(me, sort_keys = True, indent = 4))
