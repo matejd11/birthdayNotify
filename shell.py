@@ -21,6 +21,7 @@ class Shell(object):
                         "load": self.loadDb,
                         "quit": self.quit,
                         "exit": self.quit,
+                        "group": self.groupPeople,
                         "edit": [self.editPerson, self.editGroup, self.editEvent],
                         "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent],
                         "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent],
@@ -33,9 +34,10 @@ class Shell(object):
                             "Event, Group, Person\t: switch bettween modes",
                             "\tadd\t: add mode in database",
                             "\tdel\t: delete mode from database",
-                            "\tdel\t: edit mode in database",
+                            "\tedit\t: edit mode in database",
                             "\tlist\t: print mode in database",
                             "\ttable\t: print mode database table",
+                            "group\t: start grouping people",
                             "save\t: save changes in database",
                             "load\t: load database",
                             "quit\t: quit shell",
@@ -254,14 +256,45 @@ class Shell(object):
                 number = None
         while True and number != -1:
             if self.mode == 0:
-                yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName +") Y/n: ")
+                yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName +")? Y/n: ")
             if self.mode == 1 or self.mode == 2:
-                yes = input("Do you want to "+reason+"(" + db[number].name + ") Y/n: ")
+                yes = input("Do you want to "+reason+"(" + db[number].name + ")? Y/n: ")
             if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                 return number
             elif yes.lower() == 'n' or yes.lower() == 'no':
                 break
         return None
+
+    def groupPeople(self):
+        groups = self.db.groupDb.db
+        people = self.db.personDb.db
+        cycle = True
+        pList = []
+        self.showTableGroup()
+        self.mode = 1
+        gIndex = self.getNumber(groups, "choose group")
+        self.mode = 0
+        if gIndex != None:
+            while cycle is True:
+                self.showTablePerson()
+                pIndex = self.getNumber(people, "assign person")
+                if (pIndex in pList) is False:
+                    if pIndex != None:
+                        pList.append(pIndex)
+                else:
+                    print("This person is already choosen.")
+                    
+                while True:    
+                    yes = input("Do you wish to choose another person? Y/n: ")
+                    if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
+                        break
+                    elif yes.lower() == 'n' or yes.lower() == 'no':
+                        cycle = False
+                        break
+            for pIndex in pList:
+                people[int(pIndex)].group=[]
+                people[int(pIndex)].group.append(groups[gIndex].name)
+
     
     def editEvent(self):
         self.showTableEvent()

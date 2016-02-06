@@ -9,7 +9,7 @@ class Person(object):
             "telNumber",
             "facebook"]
 
-    def __init__(self, firstName, secondName, date, mail, telNumber, facebook, group = None):
+    def __init__(self, firstName, secondName, date, mail, telNumber, facebook, group = []):
         if group == None:
             group = "None"
         self.firstName = firstName
