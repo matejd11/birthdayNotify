@@ -1,9 +1,9 @@
-from person import Person
-from group import Group
-from atributes import Atribute
-from event import Event
-from messages import Messages
-from fakeDb import FakeDb
+from birthdayNotify.person import Person
+from birthdayNotify.group import Group
+from birthdayNotify.atributes import Atribute
+from birthdayNotify.event import Event
+from birthdayNotify.fakeDb import FakeDb
+from birthdayNotify.messages import Messages
 from math import ceil
 import numpy as np
 import readline

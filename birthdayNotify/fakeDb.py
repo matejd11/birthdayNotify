@@ -1,8 +1,8 @@
 import os
-from personDb import PersonDb
-from groupDb import GroupDb
-from eventDb import EventDb
-from messagesDb import MessagesDb
+from birthdayNotify.personDb import PersonDb
+from birthdayNotify.groupDb import GroupDb
+from birthdayNotify.eventDb import EventDb
+from birthdayNotify.messagesDb import MessagesDb
 
 
 class FakeDb(object):
