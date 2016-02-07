@@ -1,3 +1,5 @@
 # Python compiled files
 *.py[co1]
 \__pycache__
+*.egg*
+virtual
