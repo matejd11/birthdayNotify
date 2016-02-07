@@ -9,7 +9,7 @@ class Person(object):
             "telNumber",
             "facebook"]
 
-    def __init__(self, firstName, secondName, date, mail, telNumber, facebook, group = []):
+    def __init__(self, firstName, secondName, date, mail, telNumber, facebook, mSlots = {}, group = []):
         if group == None:
             group = "None"
         self.firstName = firstName
@@ -18,6 +18,9 @@ class Person(object):
         self.mail = mail
         self.telNumber = telNumber
         self.facebook = facebook
+        self.mSlots = mSlots
+        self.mSlots['firstName'] = firstName
+        self.mSlots['secondName'] = secondName
         self.group = group
 
     def convert(self):

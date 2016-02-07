@@ -16,22 +16,22 @@ class Shell(object):
         self.status = 1
         self.mode = 0
         self.commands = {"help": self.helpMe,
-                        "add": [self.addPerson, self.addGroup, self.addEvent],
+                        "add": [self.addPerson, self.addGroup, self.addEvent, self.addMessages],
                         "save": self.saveDb,
                         "load": self.loadDb,
                         "quit": self.quit,
                         "exit": self.quit,
                         "group": self.groupPeople,
-                        "edit": [self.editPerson, self.editGroup, self.editEvent],
-                        "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent],
-                        "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent],
+                        "edit": [self.editPerson, self.editGroup, self.editEvent, self.editMessages],
+                        "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent, self.showDbMessages],
+                        "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent, self.showTableMessages],
                         "Person": self.changeToPerson,
                         "Group": self.changeToGroup,
                         "Event": self.changeToEvent,
-                        "del": [self.deletePerson, self.deleteGroup, self.deleteEvent]}
+                        "del": [self.deletePerson, self.deleteGroup, self.deleteEvent, self.deleteMessages]}
 
         self.commandsHelp = ["help\t: show help for commands",
-                            "Event, Group, Person\t: switch bettween modes",
+                            "Event, Group, Person, Messages\t: switch bettween modes",
                             "\tadd\t: add mode in database",
                             "\tdel\t: delete mode from database",
                             "\tedit\t: edit mode in database",
@@ -75,6 +75,8 @@ class Shell(object):
             return "Group"
         if self.mode == 2:
             return "Event"
+        if self.mode == 3:
+            return "Messages"
 
     def getDbName(self):
         name = input("\tEnter name of DB(leave blank for `" + self.db.dbName + "`): ")
@@ -200,6 +202,14 @@ class Shell(object):
             
             self.db.groupDb.edit(edit, newGroup)
 
+    def createMessage(self):
+        message = input("")
+
+    def addMessages(self, edit = False):
+        if edit is False:
+            name = input("\tname:\t")
+            
+
     def addPerson(self, edit = False):
         print("    add")
         if edit is False:
@@ -209,6 +219,23 @@ class Shell(object):
             oldPerson = self.db.personDb.db[edit]
             firstName = input("\tfirstName("+oldPerson.firstName+"): ")
             secondName = input("\tsecondName("+oldPerson.secondName+"): ")
+
+        if edit is False:
+            print("\t**Message slots will help you making better messages")
+            dictPrint = ("\tSlots: <firstName> = "+firstName+", <secondName> = "+secondName)
+            mSlots = {}
+            while True:
+                print(dictPrint)
+                yes = input("\tMore slots? Y/n: ")
+                if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
+                    pass
+                elif yes.lower() == 'n' or yes.lower() == 'no':
+                    break
+                slotName = "<"+str(input("\tmessageSlotName: "))+">"
+                slot = str(input("\tContent of "+slotName+": "))
+                mSlots[slotName] = slot
+                dictPrint += ", "+slotName+" = "+slot
+
 
         dates = {}
         for event in self.db.eventDb.db:
@@ -246,7 +273,7 @@ class Shell(object):
         else:
             facebook = input("\tfacebook("+oldPerson.facebook+"): ")
 
-        newPerson = Person(firstName, secondName, dates, mail, telNumber, facebook)
+        newPerson = Person(firstName, secondName, dates, mail, telNumber, facebook, mSlots)
 
         if edit is False:
             self.db.personDb.add(newPerson)
@@ -300,7 +327,9 @@ class Shell(object):
             for pIndex in pList:
                 people[int(pIndex)].group=[]
                 people[int(pIndex)].group.append(groups[gIndex].name)
-
+    
+    def editMessages(self):
+        pass
     
     def editEvent(self):
         self.showTableEvent()
@@ -319,7 +348,10 @@ class Shell(object):
         number = self.getNumber(self.db.personDb.db, "edit")
         if number != None:
             self.addPerson(number)
-    
+
+    def deleteMessages(self):
+        pass
+
     def deleteEvent(self):
         self.showTableEvent()
         number = self.getNumber(self.db.eventDb.db, "delete")
@@ -358,6 +390,9 @@ class Shell(object):
         if number != None:
             self.db.personDb.remove(number)
 
+    def showDbMessages(self):
+        pass
+
     def showDbEvent(self):
         for event in self.db.eventDb.db:
             print(event)
@@ -372,6 +407,9 @@ class Shell(object):
 
     def quit(self):
         self.status = 0
+
+    def showTableMessages(self):
+        pass
 
     def showTableEvent(self):
         head = ["Event name",
