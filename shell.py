@@ -120,17 +120,17 @@ class Shell(object):
     def addAtributes(self, event, edit = False):
         print("\t\tAtributes for "+event.name)
         while True:
-            if edit is False:
-                facebook = self.checkBox("\t\t  send by Facebook: ")
-                sms = self.checkBox("\t\t  send by sms: ")
-                mail = self.checkBox("\t\t  send by e-mail: ")
-                show = self.checkBox("\t\t  show message: ")
+            if edit is False or (event.name in self.db.groupDb.db[edit].eventsAtr) is False:
+                facebook = self.checkBox("\t\t  send by Facebook:\t")
+                sms = self.checkBox("\t\t  send by sms:\t\t")
+                mail = self.checkBox("\t\t  send by e-mail:\t")
+                show = self.checkBox("\t\t  show message:\t\t")
             else:
                 oldAtr = self.db.groupDb.db[edit].eventsAtr[event.name]
-                facebook = self.checkBox("\t\t  send by Facebook("+str(oldAtr.facebook)+"): ")
-                sms = self.checkBox("\t\t  send by sms("+str(oldAtr.sms)+"): ")
-                mail = self.checkBox("\t\t  send by e-mail("+str(oldAtr.mail)+"): ")
-                show = self.checkBox("\t\t  show message("+str(oldAtr.show)+"): ")
+                facebook = self.checkBox("\t\t  send by Facebook("+str(int(oldAtr.facebook))+"):\t")
+                sms = self.checkBox("\t\t  send by sms("+str(int(oldAtr.sms))+"):\t")
+                mail = self.checkBox("\t\t  send by e-mail("+str(int(oldAtr.mail))+"):\t")
+                show = self.checkBox("\t\t  show message("+str(int(oldAtr.show))+"):\t")
 
             if facebook == True or sms == True or mail == True or show == True:
                 break
@@ -192,6 +192,12 @@ class Shell(object):
         if edit is False:
             self.db.groupDb.add(newGroup)
         else:
+            group = self.db.groupDb.db[edit]
+            for person in self.db.personDb.db:
+                if (group.name in person.group) is True:
+                    person.group.pop(person.group.index(group.name))
+                    person.group.append(newGroup.name)
+            
             self.db.groupDb.edit(edit, newGroup)
 
     def addPerson(self, edit = False):
@@ -318,13 +324,33 @@ class Shell(object):
         self.showTableEvent()
         number = self.getNumber(self.db.eventDb.db, "delete")
         if number != None:
+            oldEvent = self.db.eventDb.db[number]
+            for person in self.db.personDb.db:
+                tmp = person.__dict__
+                del tmp["date"][oldEvent.name]
+
+            for group in self.db.groupDb.db:
+                for atr in group.eventsAtr:
+                    if group.eventsAtr[atr].event.name == oldEvent.name:
+                        del group.eventsAtr[atr]
+                        break
+                if len(group.eventsAtr) == 0:
+                    print("Group("+group.name+") has been removed for having no atributes!")
+                    self.removeGroup(self.db.groupDb.db.index(group))
             self.db.eventDb.remove(number)
+
+    def removeGroup(self, number):
+        group = self.db.groupDb.db[number]
+        for person in self.db.personDb.db:
+            if (group.name in person.group) is True:
+                person.group.pop(person.group.index(group.name))
+        self.db.groupDb.remove(number)
 
     def deleteGroup(self):
         self.showTableGroup()
         number = self.getNumber(self.db.groupDb.db, "delete")
         if number != None:
-            self.db.groupDb.remove(number)
+            self.removeGroup(number)
 
     def deletePerson(self):
         self.showTablePerson()
