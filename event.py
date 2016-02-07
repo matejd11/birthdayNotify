@@ -12,3 +12,4 @@ class Event(object):
     def __str__(self):
         me = self.__dict__
         return str(json.dumps(me, sort_keys = True, indent = 4))
+

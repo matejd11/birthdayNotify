@@ -2,6 +2,7 @@ from person import Person
 from group import Group
 from atributes import Atribute
 from event import Event
+from messages import Messages
 from fakeDb import FakeDb
 from math import ceil
 import numpy as np
@@ -22,12 +23,14 @@ class Shell(object):
                         "quit": self.quit,
                         "exit": self.quit,
                         "group": self.groupPeople,
+                        "packages": self.assignPackage,
                         "edit": [self.editPerson, self.editGroup, self.editEvent, self.editMessages],
                         "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent, self.showDbMessages],
                         "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent, self.showTableMessages],
                         "Person": self.changeToPerson,
                         "Group": self.changeToGroup,
                         "Event": self.changeToEvent,
+                        "Messages": self.changeToMessages,
                         "del": [self.deletePerson, self.deleteGroup, self.deleteEvent, self.deleteMessages]}
 
         self.commandsHelp = ["help\t: show help for commands",
@@ -37,7 +40,8 @@ class Shell(object):
                             "\tedit\t: edit mode in database",
                             "\tlist\t: print mode in database",
                             "\ttable\t: print mode database table",
-                            "group\t: start grouping people",
+                            "packages\t: packages assign"
+                            "group\t: group people",
                             "save\t: save changes in database",
                             "load\t: load database",
                             "quit\t: quit shell",
@@ -96,7 +100,7 @@ class Shell(object):
         print("    help:")
         for command in self.commandsHelp:
             print("\t", command)
-    
+
     def changeToPerson(self):
         self.mode = 0
 
@@ -106,6 +110,9 @@ class Shell(object):
     def changeToEvent(self):
         self.mode = 2
         
+    def changeToMessages(self):
+        self.mode = 3
+    
     def checkBox(self, text):
         while True:
             check = input(text)
@@ -118,6 +125,28 @@ class Shell(object):
             except ValueError:
                 if check == "":
                     return False
+
+    def assignPackage(self):
+        self.showTablePackages()
+        mes = self.db.messagesDb.db
+        mode = self.mode
+        self.mode = 3
+        pIndex = self.getNumber(mes, "choose package")
+        if pIndex != None:
+            while True:
+                self.showTableGroup()
+                groups = self.db.groupDb.db
+                self.mode = 1
+                gIndex = self.getNumber(groups, "choose group")
+                if gIndex != None:
+                    mes[pIndex].groups.append(groups[gIndex].name)
+                yes = input("\t  More groups? Y/n: ")
+                if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
+                    pass
+                elif yes.lower() == 'n' or yes.lower() == 'no':
+                    break
+        self.mode = mode
+
             
     def addAtributes(self, event, edit = False):
         print("\t\tAtributes for "+event.name)
@@ -202,13 +231,35 @@ class Shell(object):
             
             self.db.groupDb.edit(edit, newGroup)
 
-    def createMessage(self):
-        message = input("")
-
     def addMessages(self, edit = False):
         if edit is False:
-            name = input("\tname:\t")
-            
+            name = input("\tName of the package:\t")
+        else:
+            oldMessages = self.db.messagesDb.db[edit]
+            name = input("\tName of the package("+oldMessages.name+"):\t")
+
+        print("\t  **Use slots as <firstName> or <secondName> for better message")
+        mList = []
+        x = -1
+        while True:
+            x += 1
+            if edit is False:
+                message = input("\t\tmessage("+str(x)+"):\t")
+            else:
+                message = input("\t\tmessage("+str(x)+")("+oldMessages.mList[0]+"):\t")
+            mList.append(message)
+
+            yes = input("\t  More messages? Y/n: ")
+            if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
+                pass
+            elif yes.lower() == 'n' or yes.lower() == 'no':
+                break
+        
+        newMessages = Messages(name,mList)
+        if edit is False:
+            self.db.messagesDb.add(newMessages)
+        else:
+            self.db.messagesDb.edit(edit, newMessages)
 
     def addPerson(self, edit = False):
         print("    add")
@@ -290,7 +341,7 @@ class Shell(object):
         while True and number != -1:
             if self.mode == 0:
                 yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName +")? Y/n: ")
-            if self.mode == 1 or self.mode == 2:
+            if self.mode == 1 or self.mode == 2 or self.mode == 3:
                 yes = input("Do you want to "+reason+"(" + db[number].name + ")? Y/n: ")
             if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                 return number
@@ -329,7 +380,10 @@ class Shell(object):
                 people[int(pIndex)].group.append(groups[gIndex].name)
     
     def editMessages(self):
-        pass
+        self.showTablePackages()
+        number = self.getNumber(self.db.messagesDb.db, "edit")
+        if number != None:
+            self.addMessages(number)
     
     def editEvent(self):
         self.showTableEvent()
@@ -350,7 +404,10 @@ class Shell(object):
             self.addPerson(number)
 
     def deleteMessages(self):
-        pass
+        self.showTableMessages()
+        number = self.getNumber(self.db.messagesDb.db, "delete")
+        if number != None:
+            self.removeMessages(number)
 
     def deleteEvent(self):
         self.showTableEvent()
@@ -391,7 +448,8 @@ class Shell(object):
             self.db.personDb.remove(number)
 
     def showDbMessages(self):
-        pass
+        for package in self.db.messagesDb.db:
+            print(package)
 
     def showDbEvent(self):
         for event in self.db.eventDb.db:
@@ -408,12 +466,37 @@ class Shell(object):
     def quit(self):
         self.status = 0
 
+    def showTablePackages(self):
+        head = ["Package name",
+                "Groups assigned"]
+        
+        content = []
+        for package in self.db.messagesDb.db:
+            dicti = {}
+            dicti["name"] = package.name
+            dicti["groups"] = package.groups
+            content.append(dicti)
+        
+        self.showTable(head, content, ["name", "groups"])
+
     def showTableMessages(self):
-        pass
+        self.showTablePackages()
+        index = self.getNumber(self.db.messagesDb.db, "choose package")
+        if index != None:
+            package = self.db.messagesDb.db[index]
+            head = ["Messages from '"+package.name+"' package"]
+
+            content = []
+            for message in package.mList:
+                dicti  = {}
+                dicti["mList"] = message
+                content.append(dicti)
+
+            self.showTable(head, content, ["mList"])    
 
     def showTableEvent(self):
         head = ["Event name",
-                "Shortcut",]
+                "Shortcut"]
         
         content = []
         for event in self.db.eventDb.db:
