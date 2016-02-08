@@ -228,6 +228,10 @@ class Shell(object):
                 if (group.name in person.group) is True:
                     person.group.pop(person.group.index(group.name))
                     person.group.append(newGroup.name)
+            for package in self.db.messages.db:
+                if (group.name in package.groups) is True:
+                    package.group.pop(package.group.index(group.name))
+                    package.group.append(newGroup.name)
             
             self.db.groupDb.edit(edit, newGroup)
 
@@ -254,6 +258,9 @@ class Shell(object):
                 pass
             elif yes.lower() == 'n' or yes.lower() == 'no':
                 break
+
+        for message in mList:
+        #REGEX add slots
         
         newMessages = Messages(name,mList)
         if edit is False:
@@ -433,6 +440,10 @@ class Shell(object):
         for person in self.db.personDb.db:
             if (group.name in person.group) is True:
                 person.group.pop(person.group.index(group.name))
+        for package in self.db.messages.db:
+            if (group.name in package.groups) is True:
+                package.group.pop(package.group.index(group.name))
+
         self.db.groupDb.remove(number)
 
     def deleteGroup(self):

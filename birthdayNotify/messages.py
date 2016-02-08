@@ -2,9 +2,11 @@ import json
 
 
 class Messages(object):
-    def __init__(self, name, mList, groups = None):
+    def __init__(self, name, mList, slots = None, groups = None):
         if groups == None:
             groups = []
+        if slots == None:
+            slots == []
         self.name = name
         self.mList = mList
         self.groups = groups
