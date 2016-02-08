@@ -6,13 +6,15 @@ from birthdayNotify.messagesDb import MessagesDb
 
 
 class FakeDb(object):
-    def __init__(self, dbName, autoload = True):
+    def __init__(self, dbName, *, path = None, autoload = True):
+        if path == None:
+            path = './data/'
         self.dbName = dbName
         self.setDbNames(dbName)
-        self.personDb = PersonDb(self.personDbName, autoload)
-        self.groupDb = GroupDb(self.groupDbName, autoload)
-        self.eventDb = EventDb(self.eventDbName, autoload)
-        self.messagesDb = MessagesDb(self.messagesDbName, autoload)
+        self.personDb = PersonDb(self.personDbName, autoload = autoload)
+        self.groupDb = GroupDb(self.groupDbName, autoload = autoload)
+        self.eventDb = EventDb(self.eventDbName, autoload = autoload)
+        self.messagesDb = MessagesDb(self.messagesDbName, autoload = autoload)
         if autoload:
             self.setup()
 

@@ -1,7 +1,7 @@
 
 
 class Atribute(object):
-    def __init__(self, event, facebook = False, sms = False, mail = False, show = False):
+    def __init__(self, event, *, facebook = False, sms = False, mail = False, show = False):
         self.event = event
         self.facebook = facebook
         self.sms = sms

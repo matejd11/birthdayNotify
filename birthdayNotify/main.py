@@ -3,7 +3,7 @@ from birthdayNotify.shell import Shell
 import argparse
 import sys
 
-def some(shell):
+def some(*, shell):
     if shell:
         shell = Shell("skuska")
         shell.go()
@@ -16,7 +16,7 @@ def main():
 
     result = parser.parse_args()
 
-    some(result.shell)
+    some(shell = result.shell)
 
 if __name__ == '__main__':
     main()

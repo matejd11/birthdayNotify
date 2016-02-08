@@ -109,10 +109,10 @@ class Shell(object):
 
     def changeToEvent(self):
         self.mode = 2
-        
+
     def changeToMessages(self):
         self.mode = 3
-    
+
     def checkBox(self, text):
         while True:
             check = input(text)
@@ -254,7 +254,7 @@ class Shell(object):
                 pass
             elif yes.lower() == 'n' or yes.lower() == 'no':
                 break
-        
+
         newMessages = Messages(name,mList)
         if edit is False:
             self.db.messagesDb.add(newMessages)
@@ -367,8 +367,8 @@ class Shell(object):
                         pList.append(pIndex)
                 else:
                     print("This person is already choosen.")
-                    
-                while True:    
+
+                while True:
                     yes = input("Do you wish to choose another person? Y/n: ")
                     if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                         break
@@ -378,13 +378,13 @@ class Shell(object):
             for pIndex in pList:
                 people[int(pIndex)].group=[]
                 people[int(pIndex)].group.append(groups[gIndex].name)
-    
+
     def editMessages(self):
         self.showTablePackages()
         number = self.getNumber(self.db.messagesDb.db, "edit")
         if number != None:
             self.addMessages(number)
-    
+
     def editEvent(self):
         self.showTableEvent()
         number = self.getNumber(self.db.eventDb.db, "edit")
@@ -469,14 +469,14 @@ class Shell(object):
     def showTablePackages(self):
         head = ["Package name",
                 "Groups assigned"]
-        
+
         content = []
         for package in self.db.messagesDb.db:
             dicti = {}
             dicti["name"] = package.name
             dicti["groups"] = package.groups
             content.append(dicti)
-        
+
         self.showTable(head, content, ["name", "groups"])
 
     def showTableMessages(self):
@@ -492,12 +492,12 @@ class Shell(object):
                 dicti["mList"] = message
                 content.append(dicti)
 
-            self.showTable(head, content, ["mList"])    
+            self.showTable(head, content, ["mList"])
 
     def showTableEvent(self):
         head = ["Event name",
                 "Shortcut"]
-        
+
         content = []
         for event in self.db.eventDb.db:
             content.append(event.__dict__)
@@ -510,7 +510,7 @@ class Shell(object):
                 "Sms",
                 "Mail",
                 "Show"]
-        
+
         content = []
         for group in (self.db.groupDb.db):
             content.append(group.convert())

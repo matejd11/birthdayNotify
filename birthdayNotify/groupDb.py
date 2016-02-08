@@ -3,7 +3,7 @@ import os
 
 
 class GroupDb(object):
-    def __init__(self, dbName, autoload = False):
+    def __init__(self, dbName, *, autoload = False):
         self.dbName = dbName
         self.db = None
         self.isChanged = False
