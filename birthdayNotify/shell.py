@@ -17,35 +17,34 @@ class Shell(object):
         self.status = 1
         self.mode = 0
         self.commands = {"help": self.helpMe,
-                        "add": [self.addPerson, self.addGroup, self.addEvent, self.addMessages],
-                        "save": self.saveDb,
-                        "load": self.loadDb,
-                        "quit": self.quit,
-                        "exit": self.quit,
-                        "group": self.groupPeople,
-                        "packages": self.assignPackage,
-                        "edit": [self.editPerson, self.editGroup, self.editEvent, self.editMessages],
-                        "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent, self.showDbMessages],
-                        "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent, self.showTableMessages],
-                        "Person": self.changeToPerson,
-                        "Group": self.changeToGroup,
-                        "Event": self.changeToEvent,
-                        "Messages": self.changeToMessages,
-                        "del": [self.deletePerson, self.deleteGroup, self.deleteEvent, self.deleteMessages]}
-
+                "add": [self.addPerson, self.addGroup, self.addEvent, self.addMessages],
+                "save": self.saveDb,
+                "load": self.loadDb,
+                "quit": self.quit,
+                "exit": self.quit,
+                "group": self.groupPeople,
+                "packages": self.assignPackage,
+                "edit": [self.editPerson, self.editGroup, self.editEvent, self.editMessages],
+                "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent, self.showDbMessages],
+                "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent, self.showTableMessages],
+                "Person": self.changeToPerson,
+                "Group": self.changeToGroup,
+                "Event": self.changeToEvent,
+                "Messages": self.changeToMessages,
+                "del": [self.deletePerson, self.deleteGroup, self.deleteEvent, self.deleteMessages]}
         self.commandsHelp = ["help\t: show help for commands",
-                            "Event, Group, Person, Messages\t: switch bettween modes",
-                            "\tadd\t: add mode in database",
-                            "\tdel\t: delete mode from database",
-                            "\tedit\t: edit mode in database",
-                            "\tlist\t: print mode in database",
-                            "\ttable\t: print mode database table",
-                            "packages\t: packages assign"
-                            "group\t: group people",
-                            "save\t: save changes in database",
-                            "load\t: load database",
-                            "quit\t: quit shell",
-                            "exit\t: quit shell"]
+                "Event, Group, Person, Messages\t: switch bettween modes",
+                "\tadd\t: add mode in database",
+                "\tdel\t: delete mode from database",
+                "\tedit\t: edit mode in database",
+                "\tlist\t: print mode in database",
+                "\ttable\t: print mode database table",
+                "packages\t: packages assign"
+                "group\t: group people",
+                "save\t: save changes in database",
+                "load\t: load database",
+                "quit\t: quit shell",
+                "exit\t: quit shell"]
 
     def go(self):
         while self.status == 1:
@@ -109,10 +108,10 @@ class Shell(object):
 
     def changeToEvent(self):
         self.mode = 2
-        
+
     def changeToMessages(self):
         self.mode = 3
-    
+
     def checkBox(self, text):
         while True:
             check = input(text)
@@ -147,7 +146,7 @@ class Shell(object):
                     break
         self.mode = mode
 
-            
+
     def addAtributes(self, event, edit = False):
         print("\t\tAtributes for "+event.name)
         while True:
@@ -228,7 +227,7 @@ class Shell(object):
                 if (group.name in person.group) is True:
                     person.group.pop(person.group.index(group.name))
                     person.group.append(newGroup.name)
-            
+
             self.db.groupDb.edit(edit, newGroup)
 
     def addMessages(self, edit = False):
@@ -254,7 +253,7 @@ class Shell(object):
                 pass
             elif yes.lower() == 'n' or yes.lower() == 'no':
                 break
-        
+
         newMessages = Messages(name,mList)
         if edit is False:
             self.db.messagesDb.add(newMessages)
@@ -367,7 +366,7 @@ class Shell(object):
                         pList.append(pIndex)
                 else:
                     print("This person is already choosen.")
-                    
+
                 while True:    
                     yes = input("Do you wish to choose another person? Y/n: ")
                     if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
@@ -378,13 +377,13 @@ class Shell(object):
             for pIndex in pList:
                 people[int(pIndex)].group=[]
                 people[int(pIndex)].group.append(groups[gIndex].name)
-    
+
     def editMessages(self):
         self.showTablePackages()
         number = self.getNumber(self.db.messagesDb.db, "edit")
         if number != None:
             self.addMessages(number)
-    
+
     def editEvent(self):
         self.showTableEvent()
         number = self.getNumber(self.db.eventDb.db, "edit")
@@ -469,14 +468,14 @@ class Shell(object):
     def showTablePackages(self):
         head = ["Package name",
                 "Groups assigned"]
-        
+
         content = []
         for package in self.db.messagesDb.db:
             dicti = {}
             dicti["name"] = package.name
             dicti["groups"] = package.groups
             content.append(dicti)
-        
+
         self.showTable(head, content, ["name", "groups"])
 
     def showTableMessages(self):
@@ -495,9 +494,8 @@ class Shell(object):
             self.showTable(head, content, ["mList"])    
 
     def showTableEvent(self):
-        head = ["Event name",
-                "Shortcut"]
-        
+        head = Event.order
+
         content = []
         for event in self.db.eventDb.db:
             content.append(event.__dict__)
@@ -505,12 +503,8 @@ class Shell(object):
         self.showTable(head, content, Event.order)
 
     def showTableGroup(self):
-        head = ["Group name",
-                "Facebook",
-                "Sms",
-                "Mail",
-                "Show"]
-        
+        head = Group.order
+
         content = []
         for group in (self.db.groupDb.db):
             content.append(group.convert())
@@ -518,11 +512,8 @@ class Shell(object):
         self.showTable(head, content, Group.order)
 
     def showTablePerson(self):
-        head = ["firstName",
-                "secondName",
-                "mail",
-                "telNumber",
-                "facebook"]
+        head = Person.order
+
         order = Person.order[:]
         for event in self.db.eventDb.db:
             order.append(event.name)

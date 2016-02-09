@@ -3,7 +3,7 @@ import json
 
 class Event(object):
     order = ["name",
-             "shortcut"]
+            "shortcut"]
 
     def __init__(self, name, shortcut):
         self.name = name
