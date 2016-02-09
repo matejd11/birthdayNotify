@@ -3,10 +3,10 @@ import json
 
 class Group(object):
     order = ["name",
-             "facebook",
-             "sms",
-             "mail",
-             "show"]
+            "facebook",
+            "sms",
+            "mail",
+            "show"]
 
     def __init__(self, name, eventsAtr):
         self.name = name
