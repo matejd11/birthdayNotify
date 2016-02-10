@@ -3,7 +3,7 @@ import os
 
 
 class MessagesDb(object):
-    def __init__(self, dbName, *, autoload = True):
+    def __init__(self, dbName, autoload = True):
         self.dbName = dbName
         self.db = None
         self.isChanged = False

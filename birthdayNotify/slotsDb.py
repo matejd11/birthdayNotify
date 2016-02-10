@@ -1,8 +1,9 @@
 import pickle
+import os
 
 
-class GroupDb(object):
-    def __init__(self, dbName, autoload=False):
+class SlotsDb(object):
+    def __init__(self, dbName, autoload = True):
         self.dbName = dbName
         self.db = None
         self.isChanged = False
@@ -12,28 +13,28 @@ class GroupDb(object):
     def setup(self):
         self.db = self.load(self.dbName)
 
-    def add(self, group):
+    def add(self, slot):
         self.isChanged = True
-        self.db.append(group)
+        self.db.append(slot)
 
     def remove(self, index):
         self.isChanged = True
         self.db.pop(index)
 
-    def edit(self, index, newGroup):
+    def edit(self, index, newSlot):
         self.isChanged = True
-        self.db[index] = newGroup
+        self.db[index] = newSlot
 
-    def save(self, fileName=None):
-        if fileName is not None:
+    def save(self, fileName = None):
+        if fileName == None:
             fileName = self.dbName
-        with open(fileName, "wb") as pickleOut:
+        with open(fileName,"wb") as pickleOut:
             pickle.dump(self.db, pickleOut)
             self.dbName = fileName
             self.isChanged = False
 
-    def load(self, fileName=None):
-        if fileName is not None:
+    def load(self, fileName = None):
+        if fileName == None:
             fileName = self.dbName
         self.dbName = fileName
         self.isChanged = False
