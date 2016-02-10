@@ -1,4 +1,3 @@
-import os
 from birthdayNotify.personDb import PersonDb
 from birthdayNotify.groupDb import GroupDb
 from birthdayNotify.eventDb import EventDb
@@ -7,7 +6,7 @@ from birthdayNotify.slotsDb import SlotsDb
 
 
 class FakeDb(object):
-    def __init__(self, dbName, autoload = True):
+    def __init__(self, dbName, autoload=True):
         self.dbName = dbName
         self.setDbNames(dbName)
         self.personDb = PersonDb(self.personDbName, autoload)
@@ -19,10 +18,10 @@ class FakeDb(object):
             self.setup()
 
     def setup(self):
-        self.db = self.load(self.dbName)
+        self.load(self.dbName)
 
-    def save(self, fileName = None):
-        if fileName == None:
+    def save(self, fileName=None):
+        if fileName is None:
             fileName = self.personDbName
         self.setDbNames(fileName)
 #change to _save
@@ -32,8 +31,8 @@ class FakeDb(object):
         self.messagesDb.save(self.messagesDbName)
         self.slotsDb.save(self.slotsDbName)
 
-    def load(self, fileName = None):
-        if fileName == None:
+    def load(self, fileName=None):
+        if fileName is None:
             fileName = self.dbName
         self.setDbNames(fileName)
 #change to _save
@@ -55,4 +54,3 @@ class FakeDb(object):
         if '.db' not in result:
             result += '.db'
         return result
-

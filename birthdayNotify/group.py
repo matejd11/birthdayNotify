@@ -2,11 +2,27 @@ import json
 
 
 class Group(object):
+    header = ["name",
+              "facebook",
+              "sms",
+              "mail",
+              "show"]
+
     order = ["name",
-            "facebook",
-            "sms",
-            "mail",
-            "show"]
+             "facebook",
+             "sms",
+             "mail",
+             "show"]
+
+    def showTable(dataGroup):
+        header = Group.order[:]
+        order = Group.order[:]
+
+        content = []
+        for group in (dataGroup.db):
+            content.append(group.convert())
+
+        return header, content, order
 
     def __init__(self, name, eventsAtr):
         self.name = name
@@ -30,4 +46,4 @@ class Group(object):
 
     def __str__(self):
         me = self.convert()
-        return str(json.dumps(me, sort_keys = True, indent = 4))
+        return str(json.dumps(me, sort_keys=True, indent=4))

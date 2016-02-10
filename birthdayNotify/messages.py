@@ -2,10 +2,26 @@ import json
 
 
 class Messages(object):
-    def __init__(self, name, mList, slots = None, groups = None):
-        if groups == None:
+    header = ["Messages from 'NONE' package"]
+    order = ["mList"]
+
+    def showTable(dataMessage, index):
+        package = dataMessage.db[index]
+        header = ["Messages from '" + package.name + "' package"]
+        order = Messages.order
+
+        content = []
+        for message in package.mList:
+            dicti = {}
+            dicti["mList"] = message
+            content.append(dicti)
+
+        return header, content, order
+
+    def __init__(self, name, mList, slots=None, groups=None):
+        if groups is None:
             groups = []
-        if slots == None:
+        if slots is None:
             slots == []
         self.name = name
         self.mList = mList
@@ -13,5 +29,4 @@ class Messages(object):
 
     def __str__(self):
         me = self.__dict__
-        return str(json.dumps(me, sort_keys = True, indent = 4))
-
+        return str(json.dumps(me, sort_keys=True, indent=4))
