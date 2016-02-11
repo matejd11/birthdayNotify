@@ -3,6 +3,7 @@ from birthdayNotify.group import Group
 from birthdayNotify.event import Event
 from birthdayNotify.fakeDb import FakeDb
 from birthdayNotify.messages import Messages
+from tools import getNumber
 import readline
 import re
 
@@ -19,8 +20,9 @@ class Shell(object):
                 "load": self.loadDb,
                 "quit": self.quit,
                 "exit": self.quit,
-                "group": self.groupPeople,
-                "packages": self.assignPackage,
+                "remgroup": self.removeAssignGroup,
+                "asgroup": self.assignGroup,
+                "aspackages": self.assignPackage,
                 "edit": [self.editPerson, self.editGroup, self.editEvent, self.editMessages],
                 "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent, self.showDbMessages],
                 "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent, self.showTableMessages],
@@ -36,8 +38,8 @@ class Shell(object):
                 "\tedit\t: edit mode in database",
                 "\tlist\t: print mode in database",
                 "\ttable\t: print mode database table",
-                "packages\t: packages assign"
-                "group\t: group people",
+                "aspackages\t: packages assign"
+                "asgroup\t: group people",
                 "save\t: save changes in database",
                 "load\t: load database",
                 "quit\t: quit shell",
@@ -114,13 +116,13 @@ class Shell(object):
         mes = self.db.messagesDb.db
         mode = self.mode
         self.mode = 3
-        pIndex = self.getNumber(mes, "choose package")
+        pIndex = getNumber(mes, "choose package", self.mode)
         if pIndex is not None:
             while True:
                 self.showTableGroup()
                 groups = self.db.groupDb.db
                 self.mode = 1
-                gIndex = self.getNumber(groups, "choose group")
+                gIndex = getNumber(groups, "choose group", self.mode)
                 if gIndex is not None:
                     mes[pIndex].groups.append(groups[gIndex].name)
                 yes = input("\t  More groups? Y/n: ")
@@ -246,37 +248,31 @@ class Shell(object):
         else:
             self.db.personDb.edit(edit, newPerson)
 
-    def getNumber(self, db, reason):
-        number = None
-        while number is None or number < -1 or number >= len(db):
-            try:
-                number = int(input("Insert id to "+reason+"(insert -1 to cancel): "))
-            except ValueError:
-                number = None
-        while True and number is not -1:
-            if self.mode == 0:
-                yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName +")? Y/n: ")
-            if self.mode == 1 or self.mode == 2 or self.mode == 3:
-                yes = input("Do you want to "+reason+"(" + db[number].name + ")? Y/n: ")
-            if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
-                return number
-            elif yes.lower() == 'n' or yes.lower() == 'no':
-                break
-        return None
+    def removeAssignGroup(self):
+        pDb = self.db.personDb.db
+        self.showTablePerson()
+        pIndex = getNumber(pDb, "choose person", 0)
+        if pIndex is not None:
+            head, content, order = pDb[pIndex].showTableGroup()
+            print(head, content)
+            self.showTable([head], content, [order])
+            gIndex = getNumber(content, "choose group", "removeAG")
+            if gIndex is not None:
+                pDb[pIndex].removeGroup(content[gIndex][head])
 
-    def groupPeople(self):
+    def assignGroup(self):
         groups = self.db.groupDb.db
         people = self.db.personDb.db
         cycle = True
         pList = []
         self.showTableGroup()
         self.mode = 1
-        gIndex = self.getNumber(groups, "choose group")
+        gIndex = getNumber(groups, "choose group", self.mode)
         self.mode = 0
         if gIndex is not None:
             while cycle is True:
                 self.showTablePerson()
-                pIndex = self.getNumber(people, "assign person")
+                pIndex = getNumber(people, "assign person", self.mode)
                 if (pIndex in pList) is False:
                     if pIndex is not None:
                         pList.append(pIndex)
@@ -291,18 +287,17 @@ class Shell(object):
                         cycle = False
                         break
             for pIndex in pList:
-                people[int(pIndex)].group = []
-                people[int(pIndex)].group.append(groups[gIndex].name)
+                people[int(pIndex)].addGroup(groups[gIndex].name)
 
     def editMessages(self):
         self.showTablePackages()
-        number = self.getNumber(self.db.messagesDb.db, "edit")
+        number = getNumber(self.db.messagesDb.db, "edit", self.mode)
         if number is not None:
             self.addMessages(number)
 
     def editEvent(self):
         self.showTableEvent()
-        number = self.getNumber(self.db.eventDb.db, "edit")
+        number = getNumber(self.db.eventDb.db, "edit", self.mode)
         if number is not None:
             oldEvent = self.db.eventDb.db[number]
             name = input("\teventName("+oldEvent.name+"): ")
@@ -323,10 +318,10 @@ class Shell(object):
 
     def editGroup(self):
         self.showTableGroup()
-        number = self.getNumber(self.db.groupDb.db, "edit")
+        number = getNumber(self.db.groupDb.db, "edit", self.mode)
         if number is not None:
             group = self.db.groupDb.db[number]
-            name, eventsAtr = Group.add(self.db.eventDb, edit)
+            name, eventsAtr = Group.add(self.db.eventDb, number)
             newGroup = Group(name, eventsAtr)
             for person in self.db.personDb.db:
                 if (group.name in person.group) is True:
@@ -337,23 +332,23 @@ class Shell(object):
                 if (group.name in package.groups) is True:
                     package.group.pop(package.group.index(group.name))
                     package.group.append(newGroup.name)
-            self.db.groupDb.edit(edit, newGroup)
+            self.db.groupDb.edit(number, newGroup)
 
     def editPerson(self):
         self.showTablePerson()
-        number = self.getNumber(self.db.personDb.db, "edit")
+        number = getNumber(self.db.personDb.db, "edit", self.mode)
         if number is not None:
             self.addPerson(number)
 
     def deleteMessages(self):
         self.showTableMessages()
-        number = self.getNumber(self.db.messagesDb.db, "delete")
+        number = getNumber(self.db.messagesDb.db, "delete", self.mode)
         if number is not None:
             self.removeMessages(number)
 
     def deleteEvent(self):
         self.showTableEvent()
-        number = self.getNumber(self.db.eventDb.db, "delete")
+        number = getNumber(self.db.eventDb.db, "delete", self.mode)
         if number is not None:
             oldEvent = self.db.eventDb.db[number]
             for person in self.db.personDb.db:
@@ -383,13 +378,13 @@ class Shell(object):
 
     def deleteGroup(self):
         self.showTableGroup()
-        number = self.getNumber(self.db.groupDb.db, "delete")
+        number = getNumber(self.db.groupDb.db, "delete", self.mode)
         if number is not None:
             self.removeGroup(number)
 
     def deletePerson(self):
         self.showTablePerson()
-        number = self.getNumber(self.db.personDb.db, "delete")
+        number = getNumber(self.db.personDb.db, "delete", self.mode)
         if number is not None:
             self.db.personDb.remove(number)
 
@@ -427,7 +422,7 @@ class Shell(object):
 
     def showTableMessages(self):
         self.showTablePackages()
-        index = self.getNumber(self.db.messagesDb.db, "choose package")
+        index = getNumber(self.db.messagesDb.db, "choose package", self.mode)
         if index is not None:
             head, content, order = Messages.showTable(self.db.messagesDb, index)
             self.showTable(head, content, order)

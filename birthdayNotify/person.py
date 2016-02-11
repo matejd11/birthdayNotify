@@ -46,6 +46,20 @@ class Person(object):
         self.mSlots['secondName'] = secondName
         self.group = group
 
+    def addGroup(self, groupName):
+        if groupName not in self.group:
+            self.group.append(groupName)
+
+    def removeGroup(self, groupName):
+        self.group.remove(groupName)
+
+    def showTableGroup(self):
+        content = []
+        head = self.firstName + " " + self.secondName
+        for group in self.group:
+            content.append({head: group})
+        return head, content, head
+
     def convert(self):
         dictionary = (self.__dict__).copy()
         del dictionary["date"]
