@@ -136,34 +136,12 @@ class Shell(object):
         self.db.groupDb.add(newGroup)
 
     def addEvent(self, edit=False):
-        if edit is False:
-            name = input("\teventName: ")
-            shortcut = input("\teventShortcut: ")
-        else:
-            oldEvent = self.db.eventDb.db[edit]
-            name = input("\teventName("+oldEvent.name+"): ")
-            shortcut = input("\teventShortcut("+oldEvent.shortcut+"): ")
-
+        name = input("\teventName: ")
+        shortcut = input("\teventShortcut: ")
         newEvent = Event(name, shortcut)
-
-        if edit is False:
-            self.db.eventDb.add(newEvent)
-            for person in self.db.personDb.db:
-                person.date[newEvent.name] = ""
-        else:
-            for person in self.db.personDb.db:
-                tmp = person.__dict__
-                change = tmp["date"][oldEvent.name]
-                del tmp["date"][oldEvent.name]
-                tmp["date"][newEvent.name] = change
-
-            for group in self.db.groupDb.db:
-                for atr in group.eventsAtr:
-                    if group.eventsAtr[atr].event.name == oldEvent.name:
-                        group.eventsAtr[atr].event = newEvent
-
-            self.db.eventDb.edit(edit, newEvent)
-
+        self.db.eventDb.add(newEvent)
+        for person in self.db.personDb.db:
+            person.date[newEvent.name] = ""
 
     def addMessages(self, edit=False):
         if edit is False:
@@ -326,7 +304,22 @@ class Shell(object):
         self.showTableEvent()
         number = self.getNumber(self.db.eventDb.db, "edit")
         if number is not None:
-            self.addEvent(number)
+            oldEvent = self.db.eventDb.db[number]
+            name = input("\teventName("+oldEvent.name+"): ")
+            shortcut = input("\teventShortcut("+oldEvent.shortcut+"): ")
+            newEvent = Event(name, shortcut)
+            for person in self.db.personDb.db:
+                tmp = person.__dict__
+                change = tmp["date"][oldEvent.name]
+                del tmp["date"][oldEvent.name]
+                tmp["date"][newEvent.name] = change
+
+            for group in self.db.groupDb.db:
+                for atr in group.eventsAtr:
+                    if group.eventsAtr[atr].event.name == oldEvent.name:
+                        group.eventsAtr[atr].event = newEvent
+
+            self.db.eventDb.edit(number, newEvent)
 
     def editGroup(self):
         self.showTableGroup()
