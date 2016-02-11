@@ -1,3 +1,5 @@
+from birthdayNotify.atributes import Atribute
+from tools import checkBox
 import json
 
 
@@ -43,6 +45,34 @@ class Group(object):
                     else:
                         dictionary[self.order[atr]] = self.eventsAtr[eventAtr].event.shortcut
         return dictionary
+
+    def add(eventDb, edit=False):
+        text = ""
+        if edit is not False:
+            text = "("+edit.name+")"
+        name = input("    groupName"+text+": ")
+        print("\t#use 1: yes 0: no")
+        print("\tAssign atributes to")
+        eventsAtr = {}
+        while True:
+            check = False
+            for event in eventDb.db:
+                check = checkBox("\t  "+event.name+": ")
+                if check is True:
+                    print("\t\tAtributes for "+event.name)
+                    if edit is False or (event.name in edit.eventsAtr) is False:
+                        facebook, sms, mail, show = Atribute.addAtr(event)
+                    else:
+                        oldAtr = edit.eventsAtr[event.name]
+                        facebook, sms, mail, show = oldAtr.editAtr(event)
+                    eventAtr = Atribute(event, facebook, sms, mail, show)
+                    eventsAtr[event.name] = eventAtr
+                    atleastOne = True
+
+            if atleastOne is True:
+                break
+            print("Choose atleast one. Atributes can't be assigned to nothing.")
+        return name, eventsAtr
 
     def __str__(self):
         me = self.convert()

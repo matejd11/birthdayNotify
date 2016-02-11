@@ -1,6 +1,5 @@
 from birthdayNotify.person import Person
 from birthdayNotify.group import Group
-from birthdayNotify.atributes import Atribute
 from birthdayNotify.event import Event
 from birthdayNotify.fakeDb import FakeDb
 from birthdayNotify.messages import Messages
@@ -110,19 +109,6 @@ class Shell(object):
     def changeToMessages(self):
         self.mode = 3
 
-    def checkBox(self, text):
-        while True:
-            check = input(text)
-            try:
-                check = int(check)
-                if check == 0:
-                    return False
-                if check == 1:
-                    return True
-            except ValueError:
-                if check == "":
-                    return False
-
     def assignPackage(self):
         self.showTablePackages()
         mes = self.db.messagesDb.db
@@ -144,25 +130,10 @@ class Shell(object):
                     break
         self.mode = mode
 
-    def addAtributes(self, event, edit=False):
-        print("\t\tAtributes for "+event.name)
-        while True:
-            if edit is False or (event.name in self.db.groupDb.db[edit].eventsAtr) is False:
-                facebook = self.checkBox("\t\t  send by Facebook:\t")
-                sms = self.checkBox("\t\t  send by sms:\t\t")
-                mail = self.checkBox("\t\t  send by e-mail:\t")
-                show = self.checkBox("\t\t  show message:\t\t")
-            else:
-                oldAtr = self.db.groupDb.db[edit].eventsAtr[event.name]
-                facebook = self.checkBox("\t\t  send by Facebook("+str(int(oldAtr.facebook))+"):\t")
-                sms = self.checkBox("\t\t  send by sms("+str(int(oldAtr.sms))+"):\t")
-                mail = self.checkBox("\t\t  send by e-mail("+str(int(oldAtr.mail))+"):\t")
-                show = self.checkBox("\t\t  show message("+str(int(oldAtr.show))+"):\t")
-
-            if facebook is True or sms is True or mail is True or show is True:
-                break
-            print("Choose atleast one atribute.")
-        return Atribute(event, facebook, sms, mail, show)
+    def addGroup(self, edit=False):
+        name, eventsAtr = Group.add(self.db.eventDb, edit)
+        newGroup = Group(name, eventsAtr)
+        self.db.groupDb.add(newGroup)
 
     def addEvent(self, edit=False):
         if edit is False:
@@ -193,44 +164,6 @@ class Shell(object):
 
             self.db.eventDb.edit(edit, newEvent)
 
-    def addGroup(self, edit=False):
-        if edit is False:
-            name = input("    groupName: ")
-        else:
-            name = input("    groupName("+self.db.groupDb.db[edit].name+"): ")
-
-        print("\t#use 1: yes 0: no")
-        print("\tAssign atributes to")
-        eventsAtr = {}
-        while True:
-            check = False
-            for event in self.db.eventDb.db:
-                check = self.checkBox("\t  "+event.name+": ")
-                if check is True:
-                    eventAtr = self.addAtributes(event, edit)
-                    eventsAtr[event.name] = eventAtr
-                    atleastOne = True
-
-            if atleastOne is True:
-                break
-            print("Choose atleast one. Atributes can't be assigned to nothing.")
-
-        newGroup = Group(name, eventsAtr)
-        if edit is False:
-            self.db.groupDb.add(newGroup)
-        else:
-            group = self.db.groupDb.db[edit]
-            for person in self.db.personDb.db:
-                if (group.name in person.group) is True:
-                    person.group.pop(person.group.index(group.name))
-                    person.group.append(newGroup.name)
-
-            for package in self.db.messages.db:
-                if (group.name in package.groups) is True:
-                    package.group.pop(package.group.index(group.name))
-                    package.group.append(newGroup.name)
-
-            self.db.groupDb.edit(edit, newGroup)
 
     def addMessages(self, edit=False):
         if edit is False:
@@ -337,7 +270,7 @@ class Shell(object):
 
     def getNumber(self, db, reason):
         number = None
-        while number is not None or number < -1 or number >= len(db):
+        while number is None or number < -1 or number >= len(db):
             try:
                 number = int(input("Insert id to "+reason+"(insert -1 to cancel): "))
             except ValueError:
@@ -399,7 +332,19 @@ class Shell(object):
         self.showTableGroup()
         number = self.getNumber(self.db.groupDb.db, "edit")
         if number is not None:
-            self.addGroup(number)
+            group = self.db.groupDb.db[number]
+            name, eventsAtr = Group.add(self.db.eventDb, edit)
+            newGroup = Group(name, eventsAtr)
+            for person in self.db.personDb.db:
+                if (group.name in person.group) is True:
+                    person.group.pop(person.group.index(group.name))
+                    person.group.append(newGroup.name)
+
+            for package in self.db.messagesDb.db:
+                if (group.name in package.groups) is True:
+                    package.group.pop(package.group.index(group.name))
+                    package.group.append(newGroup.name)
+            self.db.groupDb.edit(edit, newGroup)
 
     def editPerson(self):
         self.showTablePerson()
