@@ -27,6 +27,15 @@ class Messages(object):
         self.mList = mList
         self.groups = groups
 
+    def convert(self):
+        dicti = {}
+        dicti["name"] = self.name
+        groups = []
+        for group in self.groups:
+            groups.append(group.name)
+        dicti["groups"] = groups
+        return dicti
+
     def __str__(self):
         me = self.__dict__
         return str(json.dumps(me, sort_keys=True, indent=4))

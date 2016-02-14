@@ -46,9 +46,9 @@ class Person(object):
         self.mSlots['secondName'] = secondName
         self.group = group
 
-    def addGroup(self, groupName):
-        if groupName not in self.group:
-            self.group.append(groupName)
+    def addGroup(self, group):
+        if group not in self.group:
+            self.group.append(group)
 
     def removeGroup(self, groupName):
         self.group.remove(groupName)
@@ -57,15 +57,22 @@ class Person(object):
         content = []
         head = self.firstName + " " + self.secondName
         for group in self.group:
-            content.append({head: group})
+            content.append({head: group.name})
         return head, content, head
 
     def convert(self):
         dictionary = (self.__dict__).copy()
         del dictionary["date"]
+
         keys = self.date.keys()
         for name in keys:
             dictionary[name] = str(self.date[name])
+
+        gList = []
+        for group in self.group:
+            gList.append(group.name)
+        dictionary["group"] = gList
+
         return dictionary
 
     def __str__(self):

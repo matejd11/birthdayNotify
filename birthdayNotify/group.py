@@ -26,7 +26,9 @@ class Group(object):
 
         return header, content, order
 
-    def __init__(self, name, eventsAtr):
+    def __init__(self, name, eventsAtr=None):
+        if eventsAtr == None:
+            eventsAtr = {}
         self.name = name
         self.eventsAtr = eventsAtr
 
@@ -46,10 +48,8 @@ class Group(object):
                         dictionary[self.order[atr]] = self.eventsAtr[eventAtr].event.shortcut
         return dictionary
 
-    def add(eventDb, edit=False):
-        text = ""
-        if edit is not False:
-            text = "("+edit.name+")"
+    def add(self, eventDb):
+        text = "("+self.name+")"
         name = input("    groupName"+text+": ")
         print("\t#use 1: yes 0: no")
         print("\tAssign atributes to")
@@ -60,10 +60,10 @@ class Group(object):
                 check = checkBox("\t  "+event.name+": ")
                 if check is True:
                     print("\t\tAtributes for "+event.name)
-                    if edit is False or (event.name in edit.eventsAtr) is False:
+                    if event.name not in self.eventsAtr:
                         facebook, sms, mail, show = Atribute.addAtr(event)
                     else:
-                        oldAtr = edit.eventsAtr[event.name]
+                        oldAtr = self.eventsAtr[event.name]
                         facebook, sms, mail, show = oldAtr.editAtr(event)
                     eventAtr = Atribute(event, facebook, sms, mail, show)
                     eventsAtr[event.name] = eventAtr
@@ -72,7 +72,8 @@ class Group(object):
             if atleastOne is True:
                 break
             print("Choose atleast one. Atributes can't be assigned to nothing.")
-        return name, eventsAtr
+        self.eventsAtr = eventsAtr
+        self.name = name
 
     def __str__(self):
         me = self.convert()

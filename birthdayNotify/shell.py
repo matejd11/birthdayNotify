@@ -21,8 +21,7 @@ class Shell(object):
                 "quit": self.quit,
                 "exit": self.quit,
                 "remgroup": self.removeAssignGroup,
-                "asgroup": self.assignGroup,
-                "aspackages": self.assignPackage,
+                "assign": [ self.assignGroup, self.assignGroup, self.assignEvent, self.assignPackage],
                 "edit": [self.editPerson, self.editGroup, self.editEvent, self.editMessages],
                 "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent, self.showDbMessages],
                 "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent, self.showTableMessages],
@@ -34,12 +33,11 @@ class Shell(object):
         self.commandsHelp = ["help\t: show help for commands",
                 "Event, Group, Person, Messages\t: switch bettween modes",
                 "\tadd\t: add mode in database",
+                "\tassign\t: assign mode (Group to Person/Messages to Group)",
                 "\tdel\t: delete mode from database",
                 "\tedit\t: edit mode in database",
                 "\tlist\t: print mode in database",
                 "\ttable\t: print mode database table",
-                "aspackages\t: packages assign"
-                "asgroup\t: group people",
                 "save\t: save changes in database",
                 "load\t: load database",
                 "quit\t: quit shell",
@@ -111,6 +109,9 @@ class Shell(object):
     def changeToMessages(self):
         self.mode = 3
 
+    def assignEvent(self):
+        pass
+
     def assignPackage(self):
         self.showTablePackages()
         mes = self.db.messagesDb.db
@@ -124,7 +125,7 @@ class Shell(object):
                 self.mode = 1
                 gIndex = getNumber(groups, "choose group", self.mode)
                 if gIndex is not None:
-                    mes[pIndex].groups.append(groups[gIndex].name)
+                    mes[pIndex].groups.append(groups[gIndex])
                 yes = input("\t  More groups? Y/n: ")
                 if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
                     pass
@@ -132,9 +133,9 @@ class Shell(object):
                     break
         self.mode = mode
 
-    def addGroup(self, edit=False):
-        name, eventsAtr = Group.add(self.db.eventDb, edit)
-        newGroup = Group(name, eventsAtr)
+    def addGroup(self):
+        newGroup = Group("NewGroup")
+        newGroup.add(self.db.eventDb)
         self.db.groupDb.add(newGroup)
 
     def addEvent(self, edit=False):
@@ -287,7 +288,7 @@ class Shell(object):
                         cycle = False
                         break
             for pIndex in pList:
-                people[int(pIndex)].addGroup(groups[gIndex].name)
+                people[int(pIndex)].addGroup(groups[gIndex])
 
     def editMessages(self):
         self.showTablePackages()
@@ -318,21 +319,16 @@ class Shell(object):
 
     def editGroup(self):
         self.showTableGroup()
-        number = getNumber(self.db.groupDb.db, "edit", self.mode)
-        if number is not None:
-            group = self.db.groupDb.db[number]
-            name, eventsAtr = Group.add(self.db.eventDb, number)
-            newGroup = Group(name, eventsAtr)
-            for person in self.db.personDb.db:
-                if (group.name in person.group) is True:
-                    person.group.pop(person.group.index(group.name))
-                    person.group.append(newGroup.name)
+        i = getNumber(self.db.groupDb.db, "edit", self.mode)
+        if i is not None:
+            group = self.db.groupDb.db[i]
+            group.add(self.db.eventDb)
 
-            for package in self.db.messagesDb.db:
-                if (group.name in package.groups) is True:
-                    package.group.pop(package.group.index(group.name))
-                    package.group.append(newGroup.name)
-            self.db.groupDb.edit(number, newGroup)
+#           for package in self.db.messagesDb.db:
+#               if (group.name in package.groups) is True:
+#                   package.group.pop(package.group.index(group.name))
+#                   package.group.append(newGroup.name)
+            self.db.groupDb.edit(i, group)
 
     def editPerson(self):
         self.showTablePerson()
@@ -413,10 +409,7 @@ class Shell(object):
 
         content = []
         for package in self.db.messagesDb.db:
-            dicti = {}
-            dicti["name"] = package.name
-            dicti["groups"] = package.groups
-            content.append(dicti)
+            content.append(package.convert())
 
         self.showTable(head, content, ["name", "groups"])
 
@@ -440,7 +433,7 @@ class Shell(object):
         self.showTable(head, content, order)
 
     def showTable(self, head, content, order):
-        spaceExtra = 2
+        spaceExtra = 1
         largestStr = {}
         length = []
         for x in head:
