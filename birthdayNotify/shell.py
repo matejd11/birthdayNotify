@@ -14,34 +14,36 @@ class Shell(object):
         self.db = FakeDb(dbName)
         self.status = 1
         self.mode = 0
-        self.commands = {"help": self.helpMe,
-                "add": [self.addPerson, self.addGroup, self.addEvent, self.addMessages],
-                "save": self.saveDb,
-                "load": self.loadDb,
-                "quit": self.quit,
-                "exit": self.quit,
-                "remgroup": self.removeAssignGroup,
-                "assign": [ self.assignGroup, self.assignGroup, self.assignEvent, self.assignPackage],
-                "edit": [self.editPerson, self.editGroup, self.editEvent, self.editMessages],
-                "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent, self.showDbMessages],
-                "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent, self.showTableMessages],
-                "Person": self.changeToPerson,
-                "Group": self.changeToGroup,
-                "Event": self.changeToEvent,
-                "Messages": self.changeToMessages,
-                "del": [self.deletePerson, self.deleteGroup, self.deleteEvent, self.deleteMessages]}
-        self.commandsHelp = ["help\t: show help for commands",
-                "Event, Group, Person, Messages\t: switch bettween modes",
-                "\tadd\t: add mode in database",
-                "\tassign\t: assign mode (Group to Person/Messages to Group)",
-                "\tdel\t: delete mode from database",
-                "\tedit\t: edit mode in database",
-                "\tlist\t: print mode in database",
-                "\ttable\t: print mode database table",
-                "save\t: save changes in database",
-                "load\t: load database",
-                "quit\t: quit shell",
-                "exit\t: quit shell"]
+        self.commands = {
+            "help": self.helpMe,
+            "add": [self.addPerson, self.addGroup, self.addEvent, self.addMessages],
+            "save": self.saveDb,
+            "load": self.loadDb,
+            "quit": self.quit,
+            "exit": self.quit,
+            "remgroup": self.removeAssignGroup,
+            "assign": [self.assignGroup, self.assignGroup, self.assignEvent, self.assignPackage],
+            "edit": [self.editPerson, self.editGroup, self.editEvent, self.editMessages],
+            "list": [self.showDbPerson, self.showDbGroup, self.showDbEvent, self.showDbMessages],
+            "table": [self.showTablePerson, self.showTableGroup, self.showTableEvent, self.showTableMessages],
+            "Person": self.changeToPerson,
+            "Group": self.changeToGroup,
+            "Event": self.changeToEvent,
+            "Messages": self.changeToMessages,
+            "del": [self.deletePerson, self.deleteGroup, self.deleteEvent, self.deleteMessages]}
+        self.commandsHelp = [
+            "help\t: show help for commands",
+            "Event, Group, Person, Messages\t: switch bettween modes",
+            "\tadd\t: add mode in database",
+            "\tassign\t: assign mode (Group to Person/Messages to Group)",
+            "\tdel\t: delete mode from database",
+            "\tedit\t: edit mode in database",
+            "\tlist\t: print mode in database",
+            "\ttable\t: print mode database table",
+            "save\t: save changes in database",
+            "load\t: load database",
+            "quit\t: quit shell",
+            "exit\t: quit shell"]
 
     def go(self):
         while self.status == 1:
@@ -323,11 +325,6 @@ class Shell(object):
         if i is not None:
             group = self.db.groupDb.db[i]
             group.add(self.db.eventDb)
-
-#           for package in self.db.messagesDb.db:
-#               if (group.name in package.groups) is True:
-#                   package.group.pop(package.group.index(group.name))
-#                   package.group.append(newGroup.name)
             self.db.groupDb.edit(i, group)
 
     def editPerson(self):
@@ -433,30 +430,31 @@ class Shell(object):
         self.showTable(head, content, order)
 
     def showTable(self, head, content, order):
-        spaceExtra = 1
-        largestStr = {}
+        space = 1
+        largest = {}
         length = []
         for x in head:
-            largestStr[x] = len(x)
+            largest[x] = len(x)
             length.append(1+len(x))
 
         for tmp in content:
             for i in range(len(order)):
-                if largestStr[head[i]] < len(str(tmp[order[i]])):
-                    largestStr[head[i]] = len(str(tmp[order[i]]))
+                if largest[head[i]] < len(str(tmp[order[i]])):
+                    largest[head[i]] = len(str(tmp[order[i]]))
 
         headStr = " ID\t"
         for i in range(len(head)-1):
-            tabSize = (largestStr[head[i]]+1+spaceExtra-length[i])
+            tabSize = (largest[head[i]]+1+space-length[i])
             headStr += "|"+head[i]+(" "*tabSize)
         headStr += "|"+head[-1]
         print(headStr)
 
         print(" "+"-"*8*17)
 
-        for count, tmp in enumerate(content):
+        for count, x in enumerate(content):
             raw = " ["+str(count)+"]\t|"
             for i in range(len(order)-1):
-                raw += str(tmp[order[i]])+" "*(largestStr[head[i]]+spaceExtra-len(str(tmp[order[i]])))+"|"
+                raw += str(x[order[i]])
+                raw += " "*(largest[head[i]]+space-len(str(x[order[i]])))+"|"
             raw += str(tmp[order[-1]])
             print(raw)
