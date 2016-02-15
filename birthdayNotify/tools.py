@@ -9,14 +9,14 @@ def getNumber(db, reason, mode):
             number = None
     while True and number is not -1:
         if mode == 0:
-            yes = input("Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName + ")? Y/n: ")
+            y = "Do you want to "+reason+"(" + db[number].firstName + " " + db[number].secondName + ")?"
         if mode == 1 or mode == 2 or mode == 3:
-            yes = input("Do you want to "+reason+"(" + db[number].name + ")? Y/n: ")
+            y = "Do you want to "+reason+"(" + db[number].name + ")?"
         if mode == "removeAG":
-            yes = input("Do you want to "+reason+"(" + str(db[number]) + ")? Y/n: ")
-        if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "":
+            y = "Do you want to "+reason+"(" + str(db[number]) + ")?"
+        if yes(y) is True:
             return number
-        elif yes.lower() == 'n' or yes.lower() == 'no':
+        else:
             break
     return None
 
@@ -33,3 +33,13 @@ def checkBox(text):
         except ValueError:
             if check == "":
                 return False
+
+
+def yes(text):
+    while True:
+        yes = input(text+" Y/n: ")
+        if yes.lower() == 'y' or yes.lower() == 'yes' or yes == "" or yes == "":
+            return True
+        elif yes.lower() == 'n' or yes.lower() == 'no':
+            return False
+

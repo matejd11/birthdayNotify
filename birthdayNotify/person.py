@@ -35,6 +35,8 @@ class Person(object):
             group = []
         if mSlots is None:
             mSlots = {}
+        if date is None:
+            date = {}
         self.firstName = firstName
         self.secondName = secondName
         self.date = date

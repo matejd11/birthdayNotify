@@ -1,3 +1,4 @@
+from tools import yes
 import json
 
 
@@ -18,14 +19,37 @@ class Messages(object):
 
         return header, content, order
 
-    def __init__(self, name, mList, slots=None, groups=None):
+    def __init__(self, name, mList=None, slots=None, groups=None):
         if groups is None:
             groups = []
         if slots is None:
-            slots == []
+            slots == {}
+        if mList is None:
+            mList = []
         self.name = name
         self.mList = mList
         self.groups = groups
+
+    def add(self):
+        name = input("\tName of the package("+self.name+"):\t")
+        print("\t----------------------------------------------------------------")
+        print("\t  **Usable slots: ")
+        mList = []
+        x = -1
+        while True:
+            x += 1
+            try:
+                print("\t\toldMessage:\t"+self.mList[x])
+                message = input("\t\tmessage["+str(x)+"]:\t")
+            except IndexError:
+                message = input("\t\tmessage["+str(x)+"]:\t")
+            mList.append(message)
+            #regex slots
+            #self.slots[x] = slots
+            if yes("\t  More messages?") is False:
+                break
+        self.name = name
+        self.mList = mList
 
     def convert(self):
         dicti = {}

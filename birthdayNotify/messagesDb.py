@@ -3,7 +3,7 @@ import os
 
 
 class MessagesDb(object):
-    def __init__(self, dbName, autoload = True):
+    def __init__(self, dbName, autoload=True):
         self.dbName = dbName
         self.db = None
         self.isChanged = False
@@ -25,16 +25,16 @@ class MessagesDb(object):
         self.isChanged = True
         self.db[index] = newMessages
 
-    def save(self, fileName = None):
-        if fileName == None:
+    def save(self, fileName=None):
+        if fileName is None:
             fileName = self.dbName
-        with open(fileName,"wb") as pickleOut:
+        with open(fileName, "wb") as pickleOut:
             pickle.dump(self.db, pickleOut)
             self.dbName = fileName
             self.isChanged = False
 
-    def load(self, fileName = None):
-        if fileName == None:
+    def load(self, fileName=None):
+        if fileName is None:
             fileName = self.dbName
         self.dbName = fileName
         self.isChanged = False
